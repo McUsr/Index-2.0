@@ -1,0 +1,34 @@
+This is a new Manifest file, that reflects the state of this
+project as it now works for Mac OSX, the original Manifest
+Resides in Original.zip.
+
+File Name		Archive #	Description
+-----------------------------------------------------------
+ MANIFEST                   1	
+ Makefile                   1	
+ README.1ST					1 How to compile and start use 
+ README                     1 You must read this.
+ createdb.c                 1	
+ Documentation.zip			1 Html from Unix Powertools 
+							  Describing how to use it.	
+ dbfunc.c                   1	
+ dbio.c                     1	
+ defs.h                     1	
+ index.1                    1	
+ main.c                     1	
+ Original.zip				1 The Original sources.
+ printdb.c                  1	
+ samples                    1	
+ samples/books.fmt          1	
+ samples/books.idx          1	
+ samples/bphone.idx         1	
+ samples/cdlist.fmt         1	
+ samples/cdlist.idx         1	
+ samples/cdwantlist.fmt     1	
+ samples/cdwantlist.idx     1	
+ samples/pphone.fmt         1	
+ samples/pphone.idx         1	
+ screen.c                   2	
+ searchdb.c                 1	
+ selectdb.c                 1	
+ util.c                     1	

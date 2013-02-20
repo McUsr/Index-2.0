@@ -1,0 +1,69 @@
+NEWS for index 2.0
+==================
+
+This is the changelog that goes for index. The small database program
+that is so useful for creating small databases, either for collecting of
+information, or construction of object models, your fantasy is the limit!
+
+The largest change to this formerly ascii 7-bit program is that it now
+deals sanely with UTF-8 and sorts things after the locale, with regexps
+that works with accented characters. Filenames can also contain accented
+characters, and you can still expect them to be sorted according to a
+locale's collation order. The sorting convention for your language.
+
+It is worth mentioning that I have used the ICU regexp library for
+handling unicode and regular expressions. I have leveraged upon the
+fact that ICU comes preinstalled on Mac Os X with its 14MB database of
+information for dealing with locales and collations.
+
+This means that if you want to port this to another platform, then you
+you'll have to include ICU one way or the other, and the 14MB database,
+or parts of it, to maintain the functionality. The good news is that
+ICU is open source.
+
+I have also used the ncurses library in order to deal with wide characters
+on the screen, in order to present accented characters correctly, but
+not necessarily nice. Which is more of a problem with the "codepages"
+of Mac Os X, than ncurses. As a matter of fact, the problem exists,
+due to the way the utf-16 encoding of filenames are done, accents and
+characters are encoded as two code points, so the resulting character is
+"constructed."
+
+I have also tried to follow a coding standard, and had the code
+reformatted back to about the same way David A. Curry did it originally.
+
+I have also made some changes to adapt better to Mac Os X that is
+case agnostic to filenames, and also tried to improve the usabilty a
+little bit, also in accordance with the GNU coding standards. Putting
+erromessages up at the screen and letting the user exit the program
+when he sees fit, rather than die abruptly with an error message at the
+command prompt.
+
+I have not considered the 14 character limit for filenames, but lets
+the user take the full advantage of 255 character, for the occasion that
+someone in the far east should find the program useful.
+
+I have implemented long options, and a version option to show the version
+of index and the licenses of the libraries in use.
+
+------------------------------------------------------------------------
+
+
+I have implemented ^C as a way of getting out of situations where you
+otherwise would have to enter data, before you would have the chance to
+exit the program. You can kill the program from the command line anyways,
+as long as you have job control enabled in your shell. ( In the opening
+screen where you type in a database name, and when you want to abort
+the entering of a database record)
+
+I have also implemented, together with the error message to the screen
+the ability die as gracefully as possible. I do try to write any changed
+data back to the disk, if this is possible.
+
+The options are also made "posix compliant" by having long explantory
+options. That is really the only place where I have tried to respect
+posix compliancy, at the moment."
+
+The last change, was the abilit to specify a relative path to a database
+from the command-line, and also be a tadpragmatic, as to whether the
+database was specified with a suffix or not.

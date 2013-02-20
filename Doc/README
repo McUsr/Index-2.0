@@ -1,0 +1,39 @@
+README for Index:
+=================
+
+Index is a program I came by when reading Unix Power Tools at the library.
+
+First of all, you shoul go into the folder "original" and read the README
+file that is there I know this may seem like a lazy step, but the README
+file of the original author David A. Curry says a lot about what index
+is, and what it isns't.
+
+I use it for collecting facts mainly, a task it is well suited for. It
+is so fast to start a new semi or structured information collection
+with index, that you later can open pretty sorted by subject into your
+texteditor as a foundation for something else.
+
+It also plays well with sed and awk, so there is no problems sifting
+through it from Applescript, and open the result in TextEdit if one has
+such needs.
+
+The main difference between 2.0 and 1.0 is that it now handles unicode,
+and reads and writes utf-8, besides sorting by collation order. Thanks
+to IBM for their ICU library.  See NEWS for more details.
+
+The Next step is to use GNU's library and the configure utility, to ease
+porting to other platforms, and also provide a more granulated install
+experience for Mac Os X, where you amongst other things can choose a
+hardware archtiecture that suits you, as of today 2013.08.02 ony i386
+is supported. Versions of Mac Os X older than Leopard will never be
+supporoted. I'd love it if you fork this project, and push back a branch
+for your operating system. The GNU lib and the implementation of the
+autoconfiguration is right around the corner.
+
+
+Grimstad 2013.08.02 
+
+Enjoy!
+
+Tommy
+

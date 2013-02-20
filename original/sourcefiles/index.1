@@ -1,0 +1,277 @@
+.\"
+.\" $Header: /u5/davy/progs/index/RCS/index.1,v 1.1 89/08/09 11:09:42 davy Exp $
+.\"
+.\" David A. Curry
+.\" Research Institute for Advanced Computer Science
+.\" Mail Stop 230-5
+.\" NASA Ames Research Center
+.\" Moffett Field, CA 94035
+.\"
+.\" $Log:	index.1,v $
+Revision 1.1  89/08/09  11:09:42  davy
+Initial revision
+
+.\"
+.TH INDEX 1 "27 July 1989" LOCAL
+.SH NAME
+index \- maintain simple databases
+.SH SYNOPSIS
+index
+[
+.B \-f
+.I filter
+] [
+.B \-i
+] [
+.B \-v
+] [
+.I database
+] [
+.I pattern
+]
+.SH DESCRIPTION
+.PP
+.I Index
+is used to maintain simple databases such as address lists,
+lists of books or compact discs,
+and so on.
+All databases are stored as simple text files in a single directory.
+By default,
+this directory resides in your home directory,
+and is called
+.IR \&.index .
+You can specify a different path name for the directory by setting
+the environment variable
+.B \s-1INDEXDIR\s0
+to the directory's full path name.
+.PP
+When invoked with no arguments,
+.I index
+will present you with a list of the databases you have,
+and ask you to select the one you want to work with.
+To create a new database,
+simply type the name of a non-existent database to the prompt.
+The name of an existing database may also be specified on the command line,
+bypassing this step and going directly to the main menu.
+.SH CREATING A NEW DATABASE
+.PP
+When you specify the name of a non-existent database to the database
+selection prompt,
+you will be placed in a text editor to create the database description
+file.
+This file is simply a list of the field names for the database,
+one per line.
+You may have up to 16 fields in each database.
+Blank lines may be used for continuation lines in multiple-line fields,
+such as addresses.
+.PP
+The database is always sorted by the first field.
+When searching the database,
+the default is to search all fields for the pattern.
+To specify that a field should be ignored in searching,
+you should place an exclamation point (!) in the first position on
+that line.
+.PP
+When you have created the database description file,
+save the file and exit the editor.
+You will then be placed in the main menu,
+where you can manipulate the database.
+.SH THE MAIN MENU
+.PP
+The main menu is the point from which the database can be manipulated.
+This menu provides you with several commands:
+.IP \fBa\fP
+Add a new entry to the database.
+You will be presented with a list of the fields in a database entry,
+and allowed to fill them in.
+As you type,
+characters are inserted at the current cursor location.
+The editing commands available are a subset of those provided by the
+\s-1EMACS\s0 text editor:
+.RS
+.IP \fB^A\fP
+Move the cursor to the beginning of the line.
+.IP \fB^B\fP
+Move the cursor backward one character.
+.IP \fB^D\fP
+Delete the character under the cursor.
+.IP \fB^E\fP
+Move the cursor to the end of the line.
+.IP \fB^F\fP
+Move the cursor forward one character.
+.IP \fB^H\fP
+Backspace,
+deleting the character in front of the cursor.
+The \s-1DEL\s0 key also performs this function.
+.IP \fB^K\fP
+Delete from the cursor position to the end of the line.
+.IP \fB^L\fP
+Redraw the screen.
+.IP \fB<\s-1RET\s0>
+Pressing \s-1RETURN\s0 moves to the next line,
+column one.
+If you're on the last line,
+this wraps around to the first line.
+.IP \fB^N\fP
+Move to the next line,
+without moving to column one.
+If you're on the last line,
+this wraps around to the first line.
+.IP \fB^P\fP
+Move to the previous line.
+If you're on the first line,
+this wraps around to the last line.
+.IP \fB<\s-1ESC\s0>\fP
+Pressing the \s-1ESCAPE\s0 key tells
+.I index
+that you're done editing the entry.
+You will be asked whether you want to save the entry in the database.
+If you say yes,
+it will be saved.
+If you say no,
+the data you just entered will be discarded.
+If you press \s-1RETURN\s0,
+you will be returned to the editing mode.
+.RE
+.IP \fBf\fP
+Find an entry in the database.
+You will be prompted for a pattern to search for,
+and then all entries which match the pattern will be displayed,
+one at a time.
+The pattern may be any regular expression,
+as described in
+.IR ed (1).
+Case is distinguished unless the
+.B \-i
+option was given on the command line.
+See the description of the ``\fBr\fP'' command for the options available
+to you with each entry displayed.
+.IP \fBr\fP
+Read the database entry by entry.
+Each entry in the database is printed on the screen,
+along with two numbers indicating the number of entries in the database,
+and the sequential index number of this entry (e.g., ``123/500'').
+As each entry is printed,
+you will be allowed to execute the following commands:
+.RS
+.IP \fB<\s-1RET\s0>\fP
+Pressing the \s-1RETURN\s0 key will move to the next database entry.
+.IP \fB\-\fP
+Return to the previous database entry.
+.IP \fBd\fP
+Delete this entry from the database.
+You will be prompted to confirm this operation.
+.IP \fBe\fP
+Edit this database entry.
+See the description of the main menu ``\fBa\fP'' command for a list
+of the editing commands available.
+After you press \s-1ESCAPE\s0 and indicate whether you wish to save what
+you have edited,
+you will be returned to this mode again.
+.IP \fBq\fP
+Return to the main menu without looking at the rest of the entries.
+.IP \fB^L\fP
+Redraw the screen.
+.RE
+.IP \fBs\fP
+Save any modifications to the database.
+.IP \fBq\fP
+Save any modifications to the database,
+and exit
+.IR index .
+.IP \fBx\fP
+Exit
+.I index
+without saving the database.
+If the database has been modified,
+you will be asked to confirm this operation.
+.SH SEARCHING FROM THE COMMAND LINE
+.PP
+If a database name and pattern are both specified on the command line,
+the pattern will be searched for in the database,
+and any matching entries will be printed on the standard output.
+Each entry will be printed one field per line,
+preceded by its field name.
+.PP
+The pattern may be any valid regular expression,
+as defined by
+.IR ed (1).
+Case is significant,
+unless the
+.B \-i
+option is given.
+To match all entries in the database,
+use the regular expression ``.'' (matches any character).
+.PP
+By default,
+.I index
+will not print any blank lines in the entry,
+in order to make the output more readable.
+By specifying the
+.B \-v
+option,
+you can tell
+.I index
+to print all lines in the entry,
+even if they have nothing on them.
+.SH FILTERS
+.PP
+If the
+.B \-f
+option is specified with the name of a filter,
+then when a database name and pattern are also given,
+all matching entries will be sent through the filter program instead
+of to the standard output.
+.PP
+The first line of output will contain the field names for the database,
+separated by tabs.
+Each following line will contain one database entry,
+with fields separated by tabs.
+This format is easily dealt with using programs such as
+.IR awk (1).
+.PP
+As a convenience,
+filtering programs may be stored in the database directory with a
+``.fmt'' extension in their file name.
+The program is first searched for here (by adding the name extension),
+and if it is not found,
+it is then searched for (without the extension) in the standard search
+path.
+.SH EXAMPLE
+.PP
+The following database description file implements a business phone number
+list.
+It allows three lines for the company address,
+and two lines for electronic mail addresses.
+The extra fields ``Product'' and ``Keywords'' can be used to provide
+additional patterns to search for (e.g.,
+you might want to search for all disk vendors).
+The ``!'' character inhibits searching the title,
+address,
+and telephone number for patterns.
+.sp
+.nf
+Name
+!Title
+Company
+!Address
+!
+!
+!Phone
+Electronic Mail
+
+Product
+Keywords
+.fi
+.SH LIMITATIONS
+.PP
+Each database may have no more than 16 fields.
+.PP
+You may not have more than 64 separate databases.
+.PP
+A database may contain as many entries as you can allocate memory for.
+.SH SEE ALSO
+.IR awk (1),
+.IR ed (1)
+.SH AUTHOR
+David A. Curry, Research Institute for Advanced Computer Science

@@ -1,0 +1,36 @@
+Subject:  v20i056:  Maintain multiple databases of textual data, Part01/02
+Newsgroups: comp.sources.unix
+Sender: sources
+Approved: rsalz@uunet.UU.NET
+
+Submitted-by: Dave Curry <davy@riacs.edu>
+Posting-number: Volume 20, Issue 56
+Archive-name: index-db/part01
+
+This is index, Version 1.0.
+
+Index allows you to maintain multiple databases of textual information,
+each with a different format.  With each database, index allows you to:
+	- add entries
+	- delete entries
+	- edit existing entries
+	- search for entries using full regular expressions
+	- control what parts of an entry are searched
+	- print out entries matching a pattern
+	- run all or part of the database through an arbitrary
+	  formatting program
+
+The databases index maintains are stored as simple lines of text.  Each
+field of an entry is a line of text, and each entry in the database is
+made up of a fixed number of lines.  For each database, you tell index
+what each field's (line's) name is.  You can have multiple-line fields by
+leaving that field's name blank.  There's no fancy storage algorithm,
+things are just stored sequentially.  But for the biggest database I've
+got, about 500 5-line entries, performance is just fine.
+
+David A. Curry
+Research Institute for Advanced Computer Science
+Mail Stop 230-5
+NASA Ames Research Center
+Moffett Field, CA 94035
+

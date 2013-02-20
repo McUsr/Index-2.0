@@ -1,0 +1,74 @@
+							August 9, 1989
+
+This is "index", Version 1.0.
+
+Over the years, I've accumulated a number of files in my directory which
+hold lists of various things.  I have a list of business addresses, no
+less than three personal address and phone lists, a list of all the books
+I own, a list of my compact discs, and so on.  Each of these files has a
+different format, has to be maintained manually with a text editor, can
+only be searched with "grep", and is difficult to keep nicely sorted.
+
+Well, I got sick and tired of this.  So, I sat down and started hacking,
+and came up with "index".  Index allows you to maintain multiple
+databases of textual information, each with a different format.  With
+each database, index allows you to:
+
+	- add entries
+	- delete entries
+	- edit existing entries
+	- search for entries using full regular expressions
+	- control what parts of an entry are searched
+	- print out entries matching a pattern
+	- run all or part of the database through an arbitrary
+	  formatting program
+
+The databases index maintains are stored as simple lines of text.  Each
+field of an entry is a line of text, and each entry in the database is
+made up of a fixed number of lines.  For each database, you tell index
+what each field's (line's) name is.  You can have multiple-line fields by
+leaving that field's name blank.  There's no fancy storage algorithm,
+things are just stored sequentially.  But for the biggest database I've
+got, about 500 5-line entries, performance is just fine.
+
+Index uses the Berkeley curses library.  It has been tested on a Sun-3
+under SunOS 4.0.1 (4.3BSD curses) and on a Sequent Balance under Dynix
+3.0.14 (4.2BSD curses).  It should be fairly easy to port to System V -
+you'll need to modify screen.c to resolve any curses incompatibilities,
+and you'll need to change the calls to the regular expression library
+routines in searchdb.c to use the System V style routines.
+
+To compile index, just say "make".  Then make a directory in your home
+directory called ".index" (or set the environment variable INDEXDIR to
+point somewhere else).  Now, just say "index", and you can create your
+first database description file.  The directory "samples" contains some
+sample database description files and formatting scripts:
+
+	books.idx	- for keeping a list of books sorted by author.
+	books.fmt	- formats the database into a tbl input file
+			  which prints in two columns in landscape
+			  mode.
+
+	bphone.idx	- for a business phone/address database.
+
+	cdlist.idx	- for keeping a list of compact discs.
+	cdlist.fmt	- formats the database into a wide landscape-mode
+			  tbl input file.
+
+	pphone.idx	- for keeping a personal phone/address database
+			  with home and work addresses and phone numbers
+			  for your friends.
+	pphone.fmt	- formats the database into a troff file which
+			  lists each person along with their home and
+			  work addresses.  Useful for keeping by the
+			  phone or sending Xmas cards..
+
+Since moving all my lists into the index program, I've found things a lot
+easier to keep track of.  I hope you'll find it as useful as I do.
+
+David A. Curry
+Research Institute for Advanced Computer Science
+Mail Stop 230-5
+NASA Ames Research Center
+Moffett Field, CA 94035
+

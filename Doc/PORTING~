@@ -1,0 +1,45 @@
+Index v. 2.0 How to port
+========================
+
+The ability to port Index v. 2.0 are being imporved upon as you read this.
+Be sure to have the latest version from the github repo.
+
+Hard coded Mac Os X specific values:
+------------------------------------
+
+All Mac Os X's ships with /usr/bin/nano, so that editor is invoked if there
+is no editor to be found by the $EDITOR variable. You may wish to change this
+should it be another editor that ships with your system all of the time.
+
+
+Libraries
+---------
+As of today, I have leveraged upon the fact that Mac Os X ver. 10.5;
+Leopard and later comes with the ICU library preinstalled, so I leverage
+upon that. You will have to, now and for the future build the ICU library
+yourself, and figure out how to link it. You may try to get help from
+me with this matter thoug. And please push back any changes, so I can
+make a branch for your platform!
+
+I have used ICU ver. 49.1.2 for testing and development with it as
+a static library, I am not sure if I then have used my own 14Mb data
+directory, or the one that ships with Mac Os X. If you don't use Mac Os X,
+then this data directory will have to be installed locally. There were
+no problems using the ICU library as a static library, see the Makefile
+for reminisces of it.
+
+What you do need of the Ncurses library, should also be in the sourcetree,
+when it comes to header files and libncurses.a. Should this turn out
+to pose  a problem for you, then you must download a version of ncurses
+and build it for yourself. I have used Ncurses ver. 5.9
+
+Currently, I am also starting to implment GNU library to make porting
+easier. When that is done, then GNU will also be needed for linking
+statically, at this moment, an effort ahead of me is to make it compatible
+with Autotools, and libtools so you should eventually be able to link
+with GNU statically.
+
+
+Enjoy!
+
+Tommy

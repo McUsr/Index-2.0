@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# cdwantlist.fmt - format the cdwantlist database into a nice troff-able list
+#
+#
+
+#
+# Put out troff header (set point size, etc.)
+#
+cat << EOF
+.\"
+.\" Run me off with "tbl | troff -ms"
+.\" Then use "psdit -p/land.pro"
+.\"
+.nr LL 10i
+.nr PO .5i
+.nr HM .5i
+.nr FM .5i
+.nr PS 9
+.nr VS 11
+.ll 10.0i
+.po 0.5i
+.pl 8.5i
+.ps 9
+.vs 11
+.TS H
+center, expand;
+c s s s s s
+c c c c c c
+l l l l l l.
+Compact Disc Want List - \*(DY
+EOF
+
+#
+# Let awk handle reformatting.
+#
+awk    'BEGIN	{ FS = "\t" }
+		{ printf "%s\t%s\t%s\t%s\t%s\t%s\n", $1, $2, $3, $4, $5, $6
+		  if (NR == 1)
+			printf "=\n.TH\n"
+		}'
+
+#
+# Put out troff footer.
+#
+cat << EOF
+.TE
+EOF

@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+# books.fmt - format the books database into a nice troff-able list
+#
+
+#
+# Put out troff header (set point size, etc.)
+#
+cat << EOF
+.\"
+.\" Run me off with "tbl | troff -ms"
+.\" Then use "psdit -p/land.pro"
+.\"
+.nr LL 10.25i
+.nr PO .25i
+.nr HM .5i
+.nr FM .5i
+.nr PS 6
+.nr VS 8
+.ll 10.25i
+.po .25i
+.pl 8.5i
+.ps 6
+.vs 8
+.OH "''%'\*(DY'"
+.EH "''%'\*(DY'"
+.ND
+.P1
+.2C
+.TS H
+c c c c c
+l l l l c.
+EOF
+
+#
+# Let awk handle reformatting.
+#
+awk    'BEGIN	{ FS = "\t" }
+		{ printf "%s\t%s\t%s\t%s\t%s\n", $1, $2, $3, $4, $5
+		  if (NR == 1)
+			printf "=\n.TH\n"
+		}'
+
+#
+# Put out troff footer.
+#
+cat << EOF
+.TE
+EOF

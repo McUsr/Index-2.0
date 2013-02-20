@@ -1,0 +1,26 @@
+   File Name		Archive #	Description
+-----------------------------------------------------------
+ MANIFEST                   1	
+ Makefile                   1	
+ README                     1	
+ createdb.c                 1	
+ dbfunc.c                   1	
+ dbio.c                     1	
+ defs.h                     1	
+ index.1                    1	
+ main.c                     1	
+ printdb.c                  1	
+ samples                    1	
+ samples/books.fmt          1	
+ samples/books.idx          1	
+ samples/bphone.idx         1	
+ samples/cdlist.fmt         1	
+ samples/cdlist.idx         1	
+ samples/cdwantlist.fmt     1	
+ samples/cdwantlist.idx     1	
+ samples/pphone.fmt         1	
+ samples/pphone.idx         1	
+ screen.c                   2	
+ searchdb.c                 1	
+ selectdb.c                 1	
+ util.c                     1	

@@ -1,0 +1,430 @@
+.\"
+.\" $Header: /u5/davy/progs/index/RCS/index.1,v 1.1 89/08/09 11:09:42 davy Exp $
+.\"
+.\" David A. Curry
+.\" Research Institute for Advanced Computer Science
+.\" Mail Stop 230-5
+.\" NASA Ames Research Center
+.\" Moffett Field, CA 94035
+.\"
+.\" $Log:	index.1,v $
+.\"
+.TH INDEX 1 "27 July 1989" LOCAL
+.SH NAME
+.I index
+\- maintain simple text databases encoded in UTF-8.
+.SH SYNOPSIS
+index
+[
+.B OPTION 
+]...
+[
+.B DATABASE
+] [
+.B PATTERN
+]
+
+.I index
+is probably the fastest way ever to input records of data from the keyboard. And to create a database file too.
+It's output seamlessly integrates with any
+.B \s-1unix\s0
+filters you want to sift data through, or format the output with; -it can deliver output in CSV (comma separated values), for import into spread sheets or databases.
+.SH DESCRIPTION
+.PP
+.I Index
+is used to maintain simple databases such as address lists,
+lists of books or compact discs, bugs, features, todo's, glossaries, terms, receipes, grades, expenses, objects, attributes, relations, and so on.
+All databases are stored as simple UTF-8 text files, the records
+will be sorted according to your national settings
+.B \s-1$LC_ALL\s0
+and
+.B \s-1$LC_COLL\s0. (See 
+.B \s-1man locale\s0).
+Any accented characters you use should of course work as exepected.
+.I Index
+lets you input database records by providing 
+.B \s-1EMACS\s0 alike keyboard short cuts
+for moving between fields and editing in general.
+
+Your database files are stored in a single directory by default,
+if you don't specify a path on the commandline. The standard directory which the files are stored in, resides in your home
+.B \s-1($HOME)\s0
+directory,
+and is called
+.B \s-1.index\s0 
+.B \s-1($HOME/.index)\s0.
+You can specify a different path name for the directory by setting
+the environment variable
+.B \s-1$INDEXDIR\s0
+to the directory's full path name. When you specify a path for the file from the commandline,
+it can be either an absolute path to the file, or a relative path to the file, relative  to your current working directory 
+.B \s-1($PWD\s0).
+
+If you do specify a  path for the database file, then any filter files will also be looked for
+in the same directory. The label files which contains the labels for your database files, with corresponding names
+will still be looked for in the directory for which
+.B \s-1$INDEXDIR\s0
+is set or in the directory
+.B  \s-1$HOME/.index\s0.
+This gives you some advantages, if you for some reason want to just work with a subset of a database from a folder.
+.PP
+When invoked with no arguments,
+.I index
+will present you with a list of the databases you have stored in either
+.B \s-1$INDEXDIR\s0
+or
+.B \s-1$HOME/.index\s0
+(You can not select  any files you may have placed in other places interactively.)
+.IR \&index
+will then ask you to select which file/database you want to work with.
+To create a new database,
+simply type the name of a non-existent database the prompt, or specify an non-existing one at the command-line.
+Conversely, thhe name of an existing database may also be specified on the command line,
+bypassing this step and going directly to the main menu. If you are in the process of getting output from
+.IR \&index
+then you
+.I must
+specify the file on the commandline, together with a pattern and maybe a filter together with other output-options.
+.TP
+.B \s-1OPTIONS\s0
+.PP
+\fB-f\fR, \fB--filter\fR: \s-1filtername\s0
+.IP
+Specify a filter to filter the database through, some sort of executable, a shell script or more for that instance. It is convenient to have your filters residing in the
+.B \s-1$HOME/\.index\s0
+or
+.B \s-1$INDEXDIR\s0
+folder ending with a
+.B \s-1\.fmt\s0
+extension, but you can really choose any name you like. Filters will also be looked for in your
+.B \s-1$PWD\s0
+(current working directory), and in the directory where the database resides, if you have specified a path for it. You can not specify a path for the filter by itself.
+.PP
+.TP
+\fB-i\fR, \fB--ignore-case:\fR Makes the database case insensitive during searches.
+.IP
+This option works both for regular expressions specifed on the command line, and for those entered within, when
+.I
+index
+is used interactively.
+.PP
+.TP
+\fB-b\fR, \fB--verbose:\fR Prints out empty fields as newlines.
+
+.I index
+will not print any blank lines in the entry,
+in order to make the output more readable.
+By specifying the
+.B \-b
+option,
+you can tell
+.I index
+to print all lines in the entry,
+even if they have nothing on them.
+.IP
+This works by default when the output is in tabular form, (one record per line), which is the default output format 
+when a filter is in use or the \fB-H\fR option is used. Otherwise one field per line is printed, and it is then
+this option sees to that even empty fields are printed.
+.PP
+.TP
+\fB-s\fR, \fB--no-labels:\fR Don't prints the labels.
+.IP
+If the database are printed with a field on each line, then this supresses output of labels.
+The same option is for supressing headers, when the \fBheader\fR option is used in order to get
+tabular output, or a filter is specified. See the \fB-H\fR and the \fB-f\fR option.
+.PP
+.TP
+\fB-H\fR, \fB--header:\fR Print the labels as headers when printed without a filter. 
+.IP
+This presents the data in a tabular format. One record on each line. If you want to have your data presented as a table, without any headers
+then you must specify \fB-H -s\fR as command line options. This option doesn't do anything when a filter is specified.
+.PP
+.TP
+\fB-v\fR, \fB--inverted:\fR Print only those records that don't match.
+.IP
+This option works like grep -v since it is often wastly easier to create a reg-exp for the opposite.
+.B \s-1See man re_format(7).\s0
+.PP
+.TP
+\fB-r\fR, \fB--reverse:\fR Print the data in reverse ordering. Descending.
+.IP 
+Any headings will still be printed on top. (Of course.) This option doesn't work when the tool is used interactively.
+.PP
+.TP
+\fB-n\fR, \fB--nosql:\fR Trick labels into always being printed on top.
+.IP
+The trickery is to put the ascii character 0X01 in front of all fields when used as headers to keep them on top if the output is to be further sorted. The character is injected after any field-delimiter.
+.PP
+.TP
+\fB-F\fR, \fB--field-sep:\fR Sets the character you want as a field separator.
+.IP
+This works in tandem with the csv option. Any field delimiters that are found in between fields are not escaped, since we embellish the fields with hyphens. Any hyphens found in fields are escaped though, with 
+.B \s-1"\e"\s0
+the backslash character. This doesn't work when a filter \fB-r\fR isn't specifed
+or the header \fB-H\fR option isn't set.
+.PP
+.TP
+\fB-c\fR, \fB--csv:\fR Output CSV, comma separated values.
+.IP
+Creates comma separated output escaping any field-separator within fields with a back-slash \e.
+This is for making it easy to  export data from
+.IR index
+into a spread sheet, a table, or similiar.
+Labels are also comma separated and any field-separators equally escaped.
+The fields separator sepecified by the \fB-F\fR option will be used, otherewise a \fBtab\fR character will be used for separating the fields.
+The \fB-H\fR option must be set, if no filter is specifed, in order to make this option work.
+.PP
+.TP
+\fB-q\fR, \fB--quiet:\fR No output.
+.IP
+Just a dry run to see if there is data there that matches. No output is output.
+\fBReturns 0\fR if there were a match \fB1\fR otherwise. Which is the same behaviour
+if you try to get output from an empty file.
+.I index
+returns 1 if there were no data to ouput. It returns 0 when there is data to print out. 
+
+\fBNB!\fR This option doesn't work when a filter is specified.
+.PP
+.TP
+\fB-h\fR, \fB--help:\fR Prints a rudimentary help.
+.IP
+The long list of options and parameters with short explanations.
+.PP
+.TP
+\fB-u\fR, \fB--usage:\fR Prints a  very short help.
+.IP
+The short version that are shown when the command line is errounous. It is the old-style; containing the arguments and short options,
+for those with excellent memory!
+.PP
+.TP
+\fB-C\fR, \fB--copyright:\fR Prints copyright information. 
+.IP
+Shows copright for this public domain program and the libraries it leverages upon: ICU, Ncurses, and the GNU c-library.
+.PP
+.TP
+\fB-V\fR, \fB--version:\fR Prints version information. 
+.IP
+Version information for 
+.I index
+and the libraries it uses.
+.SH CREATING A NEW DATABASE
+.PP
+When you specify the name of a non-existent database to the database
+selection prompt,
+you will be placed in a text editor to create the database description
+file.
+This file is simply a list of the field names for the database,
+one per line.
+You may have up to 16 fields in each database.
+Blank lines may be used for continuation lines in multiple-line fields,
+such as addresses.
+.PP
+The database is always sorted by the first field.
+When searching the database,
+the default is to search all fields for the pattern.
+To specify that a field should be ignored in searching,
+you should place an exclamation point (!) in the first position on
+that line.
+.PP
+When you have created the database description file,
+save the file and exit the editor.
+You will then be placed in the main menu,
+where you can manipulate the database.
+.SH THE MAIN MENU
+.PP
+The main menu is the point from which the database can be manipulated.
+This menu provides you with several commands:
+.IP \fBa\fP
+Add a new entry to the database.
+You will be presented with a list of the fields in a database entry,
+and allowed to fill them in.
+As you type,
+characters are inserted at the current cursor location.
+The editing commands available are a subset of those provided by the
+\s-1EMACS\s0 text editor:
+.RS
+.IP \fB^A\fP
+Move the cursor to the beginning of the line.
+.IP \fB^B\fP
+Move the cursor backward one character.
+.IP \fB^D\fP
+Delete the character under the cursor.
+.IP \fB^E\fP
+Move the cursor to the end of the line.
+.IP \fB^F\fP
+Move the cursor forward one character.
+.IP \fB^H\fP
+Backspace,
+deleting the character in front of the cursor.
+The \s-1DEL\s0 key also performs this function.
+.IP \fB^K\fP
+Delete from the cursor position to the end of the line.
+.IP \fB^L\fP
+Redraw the screen.
+.IP \fB<\s-1RET\s0>
+Pressing \s-1RETURN\s0 moves to the next line,
+column one.
+If you're on the last line,
+this wraps around to the first line.
+.IP \fB^N\fP
+Move to the next line,
+without moving to column one.
+If you're on the last line,
+this wraps around to the first line.
+.IP \fB^P\fP
+Move to the previous line.
+If you're on the first line,
+this wraps around to the last line.
+.IP \fB<\s-1ESC\s0>\fP
+Pressing the \s-1ESCAPE\s0 key tells
+.I index
+that you're done editing the entry.
+You will be asked whether you want to save the entry in the database.
+If you say yes,
+it will be saved.
+If you say no,
+the data you just entered will be discarded.
+If you press \s-1RETURN\s0,
+you will be returned to the editing mode.
+.RE
+.IP \fBf\fP
+Find an entry in the database.
+You will be prompted for a pattern to search for,
+and then all entries which match the pattern will be displayed,
+one at a time.
+The pattern may be any regular expression,
+as described in
+.IR ed (1).
+Case is distinguished unless the
+.B \-i
+option was given on the command line.
+See the description of the ``\fBr\fP'' command for the options available
+to you with each entry displayed.
+.IP \fBr\fP
+Read the database entry by entry.
+Each entry in the database is printed on the screen,
+along with two numbers indicating the number of entries in the database,
+and the sequential index number of this entry (e.g., ``123/500'').
+As each entry is printed,
+you will be allowed to execute the following commands:
+.RS
+.IP \fB<\s-1RET\s0>\fP
+Pressing the \s-1RETURN\s0 key will move to the next database entry.
+.IP \fB\-\fP
+Return to the previous database entry.
+.IP \fBd\fP
+Delete this entry from the database.
+You will be prompted to confirm this operation.
+.IP \fBe\fP
+Edit this database entry.
+See the description of the main menu ``\fBa\fP'' command for a list
+of the editing commands available.
+After you press \s-1ESCAPE\s0 and indicate whether you wish to save what
+you have edited,
+you will be returned to this mode again.
+.IP \fBq\fP
+Return to the main menu without looking at the rest of the entries.
+.IP \fB^L\fP
+Redraw the screen.
+.RE
+.IP \fBs\fP
+Save any modifications to the database.
+.IP \fBq\fP
+Save any modifications to the database,
+and exit
+.IR index .
+.IP \fBx\fP
+Exit
+.I index
+without saving the database.
+If the database has been modified,
+you will be asked to confirm this operation.
+.SH SEARCHING FROM THE COMMAND LINE
+.PP
+If a database name and pattern are both specified on the command line,
+the pattern will be searched for in the database,
+and any matching entries will be printed on the standard output.
+Each entry will be printed one field per line,
+preceded by its field name.
+.PP
+The pattern may be any valid regular expression,
+as defined by
+.IR ed (1).
+or
+.IR re_format(7)
+It actually handles regular expressions as defined in the 
+.IR perl
+language.
+Case is significant,
+unless the
+.B \-i
+option is given.
+To match all entries in the database,
+use the regular expression ``.'' (matches any character).
+.PP
+You should really embed your regularr
+expression in single or dobule hyphens so the shell doesn't interpret them as globbed filenames.
+.SH FILTERS
+.PP
+If the
+.B \-f
+option is specified with the name of a filter,
+then when a database name and pattern are also given,
+all matching entries will be sent through the filter program instead
+of to the standard output.
+.PP
+The first line of output will contain the field names for the database,
+separated by tabs.
+Each following line will contain one database entry,
+with fields separated by tabs.
+This format is easily dealt with using programs such as
+.IR awk (1).
+.PP
+As a convenience,
+filtering programs may be stored in the database directory with a
+``.fmt'' extension in their file name.
+The program is first searched for here (by adding the name extension),
+and if it is not found,
+it is then searched for (without the extension) in the standard search
+path.
+.SH EXAMPLE
+.PP
+The following database description file implements a business phone number
+list.
+It allows three lines for the company address,
+and two lines for electronic mail addresses.
+The extra fields ``Product'' and ``Keywords'' can be used to provide
+additional patterns to search for (e.g.,
+you might want to search for all disk vendors).
+The ``!'' character inhibits searching the title,
+address,
+and telephone number for patterns.
+.sp
+.nf
+Name
+!Title
+Company
+!Address
+!
+!
+!Phone
+Electronic Mail
+
+Product
+Keywords
+.fi
+.SH LIMITATIONS
+.PP
+Each database may have no more than 16 fields.
+.PP
+You may not have more than 64 separate databases.
+.PP
+A database may contain as many entries as you can allocate memory for.
+.SH SEE ALSO
+.IR awk (1),
+.IR ed (1),
+.IR re_format(7)
+.SH ORIGINAL AUTHOR
+David A. Curry, Research Institute for Advanced Computer Science
+.SH AUTHOR VERSION 2.0
+Tommy Bollman/McUsr
