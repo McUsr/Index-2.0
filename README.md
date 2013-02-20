@@ -17,5 +17,5 @@ It builds with both i386, and X86_64 Architecture. And it runs too.
 The installation, is totally manual at the moment. be sure to read the manual file that resides in the 
 man1 folder.
 
-Enoy.
+Enjoy.
 
