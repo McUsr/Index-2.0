@@ -122,8 +122,7 @@ void select_db(void)
         we *did* create the index in the first place. See: creating new
         files on the man page. */
         char *labelfn =  getFullLabelFileName() ; 
-        int ret_code = file_is_empty( labelfn) ;
-        if (ret_code != 0) {
+        if ( file_is_empty(labelfn) || (!labelFileOkAfterLinting(labelfn))) {
             fprintf(stderr,"Index: User redecided creation of new database and thereby quitted.\n") ;
             finish(0) ;
             exit(0) ;

@@ -449,7 +449,6 @@ edit_entry(dbrecord * entry, const char *word)
     /* first time: allocat wchar fulldbdir name
        fulldbdir is a static.*/
 	for (row = STARTROW; row < (idx.idx_nlines+STARTROW); row++) { 
-/*	for (row = 0; row < idx.idx_nlines; row++) { */
 		/* print field names.                                   */
 		mvaddwstr(row, 0, idx.idx_lines[row-STARTROW]);
 	}
@@ -464,8 +463,7 @@ edit_entry(dbrecord * entry, const char *word)
             size_t linelen = (BUFSIZ * sizeof(wchar_t));
 			tmp.db_lines[k] =
                  (wchar_t *) ymalloc(linelen,
-                    "edit_entry","tmp.db_lines[i]" );
-            /* TODO: bruke memset */
+                    "edit_entry","tmp.db_lines[k]" );
             memset(tmp.db_lines[k],0,linelen);
 			tmp.db_lens[k] = 0;
 		} else {
@@ -482,13 +480,6 @@ edit_entry(dbrecord * entry, const char *word)
 			    (wchar_t *) yrealloc(tmp.db_lines[k], (size_t)
 						(BUFSIZ * sizeof(wchar_t)),"edit_entry","tmp.db_lines[k]");
 		}
-
-		/* TODO: Det som må gjøres her er å tenke over hva som skjer når vi
-		   har en ny post med data, - det er ingen ting som skal konverteres.
-		   Derimot, så alle strengene er tomme.
-
-		   Deretter så er det å behandle backspace bugen. */
-		/* TODO: hele dette med å hente inn strlen her skal bort! */
 
 		move(i, col0);
 		clrtoeol();
@@ -603,7 +594,7 @@ edit_entry(dbrecord * entry, const char *word)
 				col = col0 + tmp.db_lens[row-STARTROW];
 			line[*len] = (wchar_t) '\0';
 			break;
-		case CTRL('['):	/* save entry       ??ESC??     */
+		case CTRL('['):	/* save entry:  ESC or something...  */
 			if (line[*len] != (wchar_t) '\0')
 				line[*len] = (wchar_t) '\0';
 			sprintf(tbuf, "Save %s entry in database (y/n)? ", word);
@@ -628,22 +619,19 @@ edit_entry(dbrecord * entry, const char *word)
 						entry->db_lines[i] = NULL;
 						entry->db_lens[i] = 0;
 					} 
+                    
                     if (tmp.db_lens[i] > 0) {
                         entry->db_lens[i]=tmp.db_lens[i] ;
 						entry->db_lines[i] =
-						    unicodeFromWcs_alloc((size_t *) &entry->db_lens[i],tmp.db_lines [i]);
+						    unicodeFromWcs_alloc((size_t *) &entry->db_lens[i],tmp.db_lines[i]);
 
-						if (entry->db_lines[i] == NULL)
+					    if (entry->db_lines[i] == NULL) {
                             yerror( YICU_CONV_ERR ,"edit_entry->unicodeFromWcs_alloc", "entry->db_lines[i]", YX_EXTERNAL_CAUSE ) ;
-
-						free(tmp.db_lines[i]);
-                        tmp.db_lines[i] = NULL ;
-					    tmp.db_lens[i] = 0;
-					} else {
-						free(tmp.db_lines[i]);
-                        tmp.db_lines[i] = NULL ;
-					    tmp.db_lens[i] = 0;
-					}
+                        }
+                    } /* had a dangling else bug here ? */
+					free(tmp.db_lines[i]);
+                    tmp.db_lines[i] = NULL ;
+				    tmp.db_lens[i] = 0;
 				}
 				return (1);
 			case 'N':	/* don't save entry                 */

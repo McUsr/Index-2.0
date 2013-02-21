@@ -90,9 +90,9 @@ static void utf8Errmsg(char *prgName, char *curLocale)
 
 /* Menu used by disp_entries routine.                           */
 static const char *disp_menu[] = {
-	"<CR>  = next entry              \"d\" = delete this entry\n",
-	"\"+\" = next entry                \"e\" = edit this entry\n",
-	"\"-\" = previous entry            \"q\" = return to main menu",
+      "<CR>  = next entry              \"d\" = delete this entry\n",
+      "\"+\"   = next entry              \"e\" = edit this entry\n",
+      "\"-\"   = previous entry          \"q\" = return to main menu",
 	0
 };
 
@@ -142,17 +142,9 @@ void disp_entries(void)
 			/* FIXi moves the stuff over to db here. */
 
 			if (db[i].db_lens[j] > 0) {
-				tmp.db_lines[j] = wcsFromUnicode_alloc((size_t
-									*) &
-								       tmp.
-								       db_lens
-								       [j],
-								       db[i].
-								       db_lines
-								       [j],
-								       db[i].
-								       db_lens
-								       [j]);
+				tmp.db_lines[j] =
+                     wcsFromUnicode_alloc((size_t *) &tmp.db_lens[j], db[i].db_lines [j],
+                         db[i].db_lens [j]);
 				if (tmp.db_lines[j] == NULL) {
 					memerrmsg("disp_entries");
 				}

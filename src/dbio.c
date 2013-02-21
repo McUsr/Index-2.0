@@ -39,6 +39,7 @@ int dbmodified = 0;		/* non-zero if database needs saving    */
 
 int dbentries, dbsize;		/* number of entries, size of db array  */
 
+static int onlyspaces( char * buf ) ;
 static int reverse_data=0 ; /* governs reverse order of db */
 
 /* TODO: sjekk om disse kan deklareres static.
@@ -96,7 +97,6 @@ findUtf8OrDie(void)
 	}
 }
 
-/* TODO: just use basename for programname. */
 static void utf8Errmsg(char *prgName, char *curLocale)
 {
 	fprintf(stderr,
@@ -137,6 +137,7 @@ set_reverse(void) {
 void
 read_labelfile(void)
 {
+    const char procname[]="read_labelfile" ;
 	FILE *fp;
 
 	register int len;
@@ -148,12 +149,12 @@ read_labelfile(void)
        newLabelFilePath() ; 
        create_db() ;
         char *labelfn =  getFullLabelFileName() ; 
-        int ret_code = file_is_empty( labelfn) ;
-        if (ret_code != 0) {
+        if ( file_is_empty(labelfn) || (!labelFileOkAfterLinting(labelfn))) {
             fprintf(stderr,"Index: User redecided creating a new database and thereby quitted.\n") ;
             finish(0) ;
             exit(0) ;
         } 
+        /* we remove any trailing line-endings here */
         setLabelFileCreated() ;
         fp = fopen(labelfn,"r") ;
  /*       if (dbFileHasNoPath() ) {
@@ -161,11 +162,8 @@ read_labelfile(void)
         } */
         
     } else if (fp == NULL ) {
-        /* may it be that we can't resolve the dbfile yet? */
-        fprintf(stderr,
-            "read_labelfile: didn't find any label-file that matched the db name given, or any contents in it.\n") ;
-	    release_filenames() ;
-	    exit(YX_USER_ERROR ) ;
+           char *labelfn =  getFullLabelFileName() ; 
+           yerror(YFILE_FINDF_ERR,procname,labelfn,YX_EXTERNAL_CAUSE ) ; 
     }
     
 
@@ -174,7 +172,7 @@ read_labelfile(void)
 	/* Read lines from file.                                    */
 	while (idx.idx_nlines < MAXDBLINES) {
 		/* End of file.                                         */
-		if (fgets(buf, (int)(BUFSIZ * sizeof(char)), fp) == NULL)
+		if (fgets(buf, (int)BUFSIZ , fp) == NULL)
 			break;
 
 		/* Strip newline. replace with a colon                  */
@@ -211,7 +209,77 @@ read_labelfile(void)
 	/* Close file.                                              */
 	fclose(fp);
 }
+/*
+returns 1 if there is only spaces in a line
+*/
+static int
+onlyspaces( char * buf )
+{
+    register int i,res=1 ;
+    size_t bufend = strlen(buf) - 1 ;
+    for (i = bufend;i>-1;i-- ) {
+        if (!isspace(buf[i] )) {
+            res=0 ;
+            break ;
+        }
+    }
+    return res ;
+}
+/*
+Removes any empty lines to avoid "invisible labels", the users comfort,
+Returns 1 if the file still has contents,after "linting".
+We don't remove any white space if the line has other contents before or after
+text.
+It is called from: 
+*/
+int 
+labelFileOkAfterLinting(char *labelfn) 
+{
+    const char procname[]="labelFileOkAfterLinting" ;
+	char buf[BUFSIZ];	/* 1024 characters per line on Mac Os X */
+    FILE *fin=NULL, *fout=NULL;
+    char *lblBckFname = makeBackupName(labelfn ) ;
+	int	ret = rename(labelfn, lblBckFname);
+    if (ret) {
+        yerror(YFILE_RENMV_ERR,procname,lblBckFname,YX_EXTERNAL_CAUSE ) ; 
+    }
+    /* open the backup file for reading */
+	if ((fin = fopen(lblBckFname, "r")) == NULL )  {
+        yerror(YFILE_OREAD_ERR,procname,lblBckFname,YX_EXTERNAL_CAUSE ) ; 
+    }
+    /* reopen the label file for writing */
+	if ((fout = fopen(labelfn, "w")) == NULL )  {
+        yerror(YFILE_CREAT_ERR,procname,labelfn,YX_EXTERNAL_CAUSE ) ; 
+    }
 
+    while (!feof(fin) ) {
+        /* read it line by line */
+		if (fgets(buf, (int)BUFSIZ , fin )== NULL )  {
+            if (ferror(fin)) {
+                    yerror(YFILE_FREAD_ERR,procname,lblBckFname,YX_EXTERNAL_CAUSE ) ; 
+            }
+            break ;
+        }
+        /* check if the line contains anything but whitespace */
+        
+        if (!onlyspaces(buf)) {
+            if ( fputs(buf,fout) == EOF  ) { /* compatibility */
+                    yerror(YFILE_FWRITE_ERR,procname,labelfn,YX_EXTERNAL_CAUSE ) ; 
+            }
+        }
+    }
+    fclose(fin) ;
+    fclose(fout ) ;
+	if ( file_is_empty(labelfn ) ) {
+		return 0 ;
+	} else {
+    	return  1 ;
+	}
+}
+
+/*
+returns true if the file hasn't got any contents.
+*/
 int
 file_is_empty( char *filename)
 {
@@ -405,7 +473,7 @@ read_database()
 		/* If we need to, allocate more entries.                */
 		if (dbentries >= dbsize) {
 			dbsize *= 2;
-			db = yrealloc(db, dbsize * sizeof(dbrecord),"reade_database","db");
+			db = yrealloc(db, dbsize * sizeof(dbrecord),"read_database","db");
 
 		}
 		/* Read in one entry at a time.                         */
@@ -423,7 +491,10 @@ read_database()
 			/* hva gjør vi med tomme linjer?? */
 			if (mbuflen > 0) {
 				int32_t reslen = 0;
-
+                /* TODO: we also need to improve errors in uniocFromUTF8_alloc
+                   that would be the simplest so we never check for null upon 
+                   return from it.(can be too many causes for errors to analyze
+                   hindsightly. */
 				db[dbentries].db_lines[i] =
 				    unicodeFromUTF8_alloc(&reslen, mbsbuf,
 							  (size_t) mbuflen);
@@ -488,19 +559,22 @@ void save_db(void)
 
 	/* Create name of file and a backup file.                   */
     realfile = getFullDbName() ; 
-    bakfile = getBackupFileName()  ;
+    bakfile = getDbBackupFileName()  ;
 	/* Default creation mode.                                   */
 	/* TODO: into header with this one                         */
 	st.st_mode = 0400;
 	/* better still use ... UMOD? */
 
 	/* If file already exists, rename it to backup file name.   */
-	if (stat(realfile, &st) == 0)
-		rename(realfile, bakfile);
-
+	if (stat(realfile, &st) == 0) {
+	    int	ret = rename(realfile, bakfile);
+        if (ret) {
+           yerror(YFILE_RENMV_ERR,"save_db",bakfile,YX_EXTERNAL_CAUSE ) ; 
+        }
+    }
 	/* Open new file.                                           */
 	if ((fp = fopen(realfile, "w")) == NULL)
-		factionerrmsg(realfile, "create");
+        yerror(YFILE_CREAT_ERR,"save_db",realfile,YX_EXTERNAL_CAUSE ) ; 
 	/* Make sure database is sorted.                             */
     if (dbentries > 1 ) {
 	    UErrorCode status = U_ZERO_ERROR;

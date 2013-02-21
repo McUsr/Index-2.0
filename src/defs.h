@@ -56,6 +56,11 @@
 #define YPTH_ISPWD_ERR 6
 #define YPTH_NOPWD_ERR 7
 #define YFILE_CREAT_ERR 8
+#define YFILE_RENMV_ERR 9
+#define YFILE_FINDF_ERR 10
+#define YFILE_OREAD_ERR 11
+#define YFILE_FREAD_ERR 12
+#define YFILE_FWRITE_ERR 13
 /* constants for painting the screen correctly */
 
 #define STARTROW 4

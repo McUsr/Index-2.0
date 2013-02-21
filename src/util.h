@@ -18,6 +18,7 @@ char        *   getCollation(void) ;
 void            setCollation( char * theLocale ) ;
 void            releaseCollation(void) ;
 char        *   getProgramName( void ) ;
+void 			y_icuerror( int strIndex, const char *handler, const char *variable ) ;
 void 			yerror( int strIndex, const char *handler, const char *variable, int ourErrCode ) ;
 char        *   getMyLocale(void) ;
 void            releaseProgramName(void) ;

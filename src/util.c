@@ -25,14 +25,19 @@
 static int hasError=0;
 static const char *errstrings[] = {
     "%s: Can't allocate  memory in : \"%s\" for \"%s\".",
-    "%s: Can't reallocate  memory in : \"%s\" for \"%s\"."
-    "%s: Problems converting with ICU in : \"%s\" for \"%s\"."
-    "%s: Problems converting between mbs and wcs characters in : \"%s\" for \"%s\"."
-    "%s: Path too long when getting the basename  in : \"%s\" for the \"%s\" variable."
-    "%s: Path is root when getting the basename  in : \"%s\" for the \"%s\" variable."
-    "%s: Path is $PWD when getting the basename  in : \"%s\" for the \"%s\" variable."
-    "%s: Cannot find System Variable in : \"%s\" for the \"%s\" variable."
-    "%s: Cannot create file in : \"%s\" at the path \"%s\"."
+    "%s: Can't reallocate  memory in : \"%s\" for \"%s\".",
+    "%s: Problems converting with ICU in : \"%s\" for \"%s\".",
+    "%s: Problems converting between mbs and wcs characters in : \"%s\" for \"%s\".",
+    "%s: Path too long when getting the basename  in : \"%s\" for the \"%s\" variable.",
+    "%s: Path is root when getting the basename  in : \"%s\" for the \"%s\" variable.",
+    "%s: Path is $PWD when getting the basename  in : \"%s\" for the \"%s\" variable.",
+    "%s: Cannot find System Variable in : \"%s\" for the \"%s\" variable.",
+    "%s: Cannot create file in : \"%s\" at the path \"%s\".",
+    "%s: Cannot rename file in : \"%s\" to the name \"%s\".",
+    "%s: Cannot find file in : \"%s\" with the name \"%s\".",
+    "%s: Cannot open file for reading in : \"%s\" with the name \"%s\".",
+    "%s: Cannot read file in : \"%s\" with the name \"%s\".",
+    "%s: Cannot write file in : \"%s\" with the name \"%s\".",
     } ;
 
 static char *pname = NULL;	/* program name     */
@@ -96,32 +101,6 @@ releaseProgramName(void)
 {
 	pname = NULL;
 }
-/* 
-	We do print the program name when we interrupt the usual flow of the program.
-*/
-void
-yerror( int strIndex, const char *handler, const char *variable, int ourErrCode )
-{
-	char errl1[BUFSIZ];
-	char errl2[BUFSIZ];
-    if (!hasError) {
-        hasError = 1 ;
-	    sprintf(errl1,(const char *)errstrings[strIndex] ,pname,handler, variable) ; 
-	    sprintf(errl2,"%s: error number : %d, message: %s.",pname,errno,strerror(errno) ) ;
-        /* here is the place we call stuff if curses is inited */
-        if (curses_active() ) {
-            ;
-            /* we take down curses here */
-        }         
-        fprintf(stderr,"%s\n",errl1) ;
-        fprintf(stderr,"%s\n",errl2) ;
-
-        finish(ourErrCode) ; 
-
-   }
-	
-}
-
 void
 setProgramName(void)
 {
@@ -221,3 +200,34 @@ factionerrmsg(const char *file_name, const char *faction)
 	perror(emi);
 	exit(1);
 }
+void
+y_icuerror( int strIndex, const char *handler, const char *variable )
+{
+    ;
+}
+/* 
+	We do print the program name when we interrupt the usual flow of the program.
+*/
+void
+yerror( int strIndex, const char *handler, const char *variable, int ourErrCode )
+{
+	char errl1[BUFSIZ];
+	char errl2[BUFSIZ];
+    if (!hasError) {
+        hasError = 1 ;
+	    sprintf(errl1,(const char *)errstrings[strIndex] ,pname,handler, variable) ; 
+	    sprintf(errl2,"%s: error number : %d, message: %s.",pname,errno,strerror(errno) ) ;
+        /* here is the place we call stuff if curses is inited */
+        if (curses_active() ) {
+            ;
+            /* we take down curses here */
+        }         
+        fprintf(stderr,"%s\n",errl1) ;
+        fprintf(stderr,"%s\n",errl2) ;
+
+        finish(ourErrCode) ; 
+
+   }
+	
+}
+

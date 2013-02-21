@@ -603,20 +603,29 @@ getFullLabelFileName(void)
 	return fulllabelname ;
 }
 /*
+Makes a backupname by the emacs convention:
+we put a '~' at the end of the filename, we are fed.
+*/
+char *
+makeBackupName( const char * originalname )
+{
+	size_t bcknameLen = strlen(originalname) + 2 ;
+	char *tmpName = (char *) ymalloc(bcknameLen,"getBackupFileName","tmpName") ; 
+	strcpy(tmpName,originalname ) ;
+	strcat(tmpName,"~") ;
+ 	return tmpName ;
+}
+/*
 Returns the name for the backup file.
 (Adds "~" at end of .db name.)
 Creates the name if it doesnt exist.
 */
 char *
-getBackupFileName(void)
+getDbBackupFileName(void)
 {
 	if (!(fn_status & F_BCK_NAME )) {
 		/* create the backupfile */
-		size_t bcknameLen = strlen(fulldbname) + 2 ;
-		char *tmpName = (char *) ymalloc(bcknameLen,"getBackupFileName","tmpName") ; 
-		strcpy(tmpName,fulldbname ) ;
-		strcat(tmpName,"~") ;
-		bckdbname = tmpName ;
+		bckdbname = makeBackupName(fulldbname ) ;
 		fn_status |= F_BCK_NAME ;
 	}
 	return bckdbname ;
