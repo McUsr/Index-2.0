@@ -28,6 +28,11 @@ static const char *errstrings[] = {
     "%s: Can't reallocate  memory in : \"%s\" for \"%s\"."
     "%s: Problems converting with ICU in : \"%s\" for \"%s\"."
     "%s: Problems converting between mbs and wcs characters in : \"%s\" for \"%s\"."
+    "%s: Path too long when getting the basename  in : \"%s\" for the \"%s\" variable."
+    "%s: Path is root when getting the basename  in : \"%s\" for the \"%s\" variable."
+    "%s: Path is $PWD when getting the basename  in : \"%s\" for the \"%s\" variable."
+    "%s: Cannot find System Variable in : \"%s\" for the \"%s\" variable."
+    "%s: Cannot create file in : \"%s\" at the path \"%s\"."
     } ;
 
 static char *pname = NULL;	/* program name     */
@@ -94,7 +99,8 @@ releaseProgramName(void)
 /* 
 	We do print the program name when we interrupt the usual flow of the program.
 */
-void yerror( int strIndex, const char *handler, const char *variable, int ourErrCode )
+void
+yerror( int strIndex, const char *handler, const char *variable, int ourErrCode )
 {
 	char errl1[BUFSIZ];
 	char errl2[BUFSIZ];

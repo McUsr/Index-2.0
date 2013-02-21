@@ -1,9 +1,16 @@
 /* dbfilename.c - database filename routines 
- * this module is used in index ver 2.0 that 
- * is derived from index 1.0 by David A. Curry.
- *
- * The whole reason for this module is to support
- *  relative pathnames for databases on the commandline.
+this module is used in index ver 2.0 that 
+is derived from index 1.0 by David A. Curry.
+Purpose
+=======
+
+The whole reason for this module is to support
+relative pathnames for databases on the commandline.
+
+Business rules for finding and resolving paths
+==============================================
+
+
 TODO:
 needs shortdbname. or something telling us what we got:
 
@@ -21,6 +28,8 @@ TODO:
 		check over the utf8 routines, I think there were some issues somewhere.
 TODO:
 		flags and variables, releasing.
+TODO:
+		Update the comments further, factor out check basename.
 
  */
 #include <common.h>
@@ -29,33 +38,59 @@ TODO:
 #include <defs.h>
 #include <dbfilename.h>
  
-/* from dbselect.c */
 static FILE * openFromDir(char *fname, char *filedir ) ;
 static FILE * openLabelFileFromDir(char *fname, char *filedir ) ;
 static char * makeAfilenameFromStem(const char *suffix, char *fname, char *filedir) ;
 static char * makeAfilename( char *fname, char *filedir) ;
-static char *tildeExpandedFileName(char *farg) ;
+static char * tildeExpandedFileName(char *farg) ;
+static char * baseNameCheck( const char* pathToCheck, const char *caller, const char *variable) ;
+static char * extBasenameCheck (const char * pathToCheck, const char *caller, const char *variable) ;
  
 #define F_ARGVNAME  0x01 
-/* For the case that we need to see that we need to make the stem file name.
-   amongst other things, as we can get only the stem from command line.*/
-#define F_GOTFNAME  0x02  /* so we know whether to select a file later */
+/*
+For the case that we need to see that we need to make the stem file name.
+amongst other things, as we can get only the stem from command line.
+*/
+#define F_GOTFNAME  0x02 
+/*
+so we know whether to select a file later
+*/
+   
 #define F_FULL_PATH  0x04 
-/* implies that we have a directory supplied from the command-line. FIRST
-	LATER set when we have created a full path name. */
+/*
+implies that we have a directory supplied from the command-line. FIRST
+LATER set when we have created a full path name.
+*/
+
 #define D_INDEXDIR  0x08 
-#define D_HOMEDIR  0x10   /* set if we find the file in the homedir*/
+/*
+Set if we are using the index dir as a first stop for label files.
+*/
+
+#define D_HOMEDIR  0x10
+/*
+set if we find the file in the homedir
+*/
 #define F_LABEL_MADE  0x20 
 #define F_HAS_FILTER  0x40 
 #define L_FULL_PATH 0X80
-/* set when we have collected the full path to the label file. */
+/*
+Set when we have collected the full path to the label file.
+It is set immediately if the path is resolved from the command
+line, then it is set immediately, if not it is set when the 
+database is settled via the ui and a directory.
+*/
 #define F_BCK_NAME  0X100 
 #define F_ARGV_DIR 0X200 
 
 #define F_CREATED 0X400	
-/* set when we create a new dbase file with a name given  from command line. */
+/*
+set when we create a new dbase file with a name given  from command line.
+*/
 #define L_CREATED 0X800	
-/* gets set when we create a new index file. */
+/*
+gets set when we create a new index file.
+*/
 
 /* assumes int is 16 bits wide, we'll also use unsigned */
 static unsigned int fn_status=0; 
@@ -84,110 +119,134 @@ static char * bckdbname = NULL ;
 /* May or may not exist, if, then it is set from main.c -- set_dbase_name() */
 
 static char * fulldbdir = NULL ;
-/* May.. is then the first place to look for label and fmt files from set_dbase_name
+/*
+May.. is then the first place to look for label and fmt files from set_dbase_name
 called from main
-this is set when a db name came with a path from the commandline.*/
+this is set when a db name came with a path from the commandline.
+*/
 
 static	char *dbfilter=NULL;
-/* May or may not, this for when we have a filter we want to use. */
+/*
+May or may not, this for when we have a filter we want to use.
+*/
 
 static char *indexdir_varpath=NULL;
-/* May .. this is the directory that is set by the INDEXDIR variable. */
+/*
+May .. this is the directory that is set by the INDEXDIR variable.
+*/
 
 static char * indexhomedir = NULL ;
-/* Always .. this is the path to the directory that is hardcoded: $HOME/.index
-  if it doesn't exist, then we do try to make it. If we can't, we die with an error message.
-   except for if we are root, then we refuse to make it, and dies with an error message.  */
+/*
+Always .. this is the path to the directory that is hardcoded: $HOME/.index
+if it doesn't exist, then we do try to make it. If we can't, we die with an error message.
+except for if we are root, then we refuse to make it, and dies with an error message.
+*/
 
 static char * pwddir = NULL ;
 /* our working directory while we started up, obtained from $PWD in the shell */
 
+/*
+Returns a basename that is either a filename, or ".", otherwise dies.
+It can't take NULL as a paramter.
+Evaluates if the basename library function returns something that can be used.
+Returning the root directory is under all circumstances something we can't use.
+NULL, signigfying that the path is also too long is also something we can't use.
+"." on the other hand, can be used as a value for setting the INDEXDIR variable
+to the current directory, making the tool more flexible. It is intgreated with 
+the errror messages system.
+*/
+
+static char *
+baseNameCheck( const char* pathToCheck, const char *caller, const char *variable)
+{
+	char *basePtr= basename(pathToCheck) ;
+   	if ( basePtr == NULL ) {
+        yerror( YPTH_TOOLONG_ERR,caller,variable, YX_USER_ERROR ) ;
+   	} else  if (!strcmp(basePtr,"/")) {
+        yerror( YPTH_ISROOT_ERR,caller,variable, YX_USER_ERROR ) ;
+   	} else { 
+		return basePtr ;
+	}
+}
+/*
+returns the path from the basename library call, if it isn't NULL, "/" or "."
+*/
+static char *
+extBasenameCheck (const char * pathToCheck, const char *caller, const char *variable)
+{
+	char *extBasePtr=baseNameCheck(pathToCheck,caller,variable ) ;
+     if (!strcmp(extBasePtr,".")) {
+        yerror( YPTH_ISPWD_ERR,caller,variable, YX_USER_ERROR ) ;
+	 }
+	return extBasePtr ;
+}
+
+/*
+Collects necessary directories during initialization of the program
+TODO: USE PWD FOR "." HERE
+*/
 void
 collect_dbase_dirs(void)
 {
 	char *s = NULL;
-	char *tst_stem= NULL ;
-	/* if defined, then this is where we are looking for db's */
-	if ((s = getenv("INDEXDIR")) != NULL) {
-    	tst_stem = basename(s) ;
-    	/* precautionary tests */
-    	if ( tst_stem == NULL ) {
-			release_filenames();
-    		perror("collect_dbase_dirs, path too long in INDEXDIR variable.") ;
-    		exit(YX_USER_ERROR) ;
-    	} else  if (!strcmp(tst_stem,".")) {
-			release_filenames();
-    		fprintf(stderr,"collect_dbase_dirs: \".\" is not a valid directory in INDEXDIR variable\n") ;
-    		exit(YX_USER_ERROR) ;
-    	} else  if (!strcmp(tst_stem,"/")) {
-			release_filenames();
-    		fprintf(stderr,"collect_dbase_dirs: \"/\" is not a valid directory in INDEXDIR variable\n") ;
-    		exit(YX_USER_ERROR) ;
-    	} else {
-			size_t tst_stem_len = strlen(tst_stem ) + 1 ;	
-			indexdir_varpath = (char *) ymalloc(tst_stem_len,"collectDbaseDirs","indexdir_varpath") ; 
-			fn_status = (fn_status | D_INDEXDIR) ;
-			/* But it has to resolve to something */
-			strcpy(indexdir_varpath, s);
-			tst_stem = NULL ;	
-		}
-	}
-
-	/* Otherwise, it's in home directory.                   */
-	if ((s = getenv("HOME")) == NULL) {
-		release_filenames();
-		fprintf(stderr, "collect_dbase_dirs: cannot get home directory.\n");
-		exit(YX_USER_ERROR);
-	}
-	size_t home_slen = strlen(s) +  strlen(INDEXDIR) + 2 ;
-	
-	indexhomedir = (char *) ymalloc(home_slen,"collectDbaseDirs","indexhomedir") ; 
-	fn_status |= D_HOMEDIR ;
-	/* Make name.                                           */
-	strcpy(indexhomedir,s) ;
-	strcat(indexhomedir,"/") ;
-	strcat(indexhomedir,INDEXDIR) ;
-	s=NULL ;
 	/* and finally, we gather the PWD */
 	if ((s = getenv("PWD")) == NULL) { /* This *SHOULD* work in most situation */
-		release_filenames();
-		fprintf(stderr, "collect_dbase_dirs: cannot get home directory.\n");
-		exit(YX_USER_ERROR);
+		yerror(YPTH_NOPWD_ERR,"collect_dbase_dirs","$PWD",YX_EXTERNAL_CAUSE ) ;
 	}
 	size_t pwdlen = strlen(s) + 2 ;
 	pwddir = (char *) ymalloc(pwdlen,"collectDbaseDirs","pwddir") ; 
 	strcpy(pwddir,s) ;
 	strcat(pwddir,"/") ;
+	char *tst_stem= NULL ;
+	/* if defined, then this is where we are looking for db's */
+	if ((s = getenv("INDEXDIR")) != NULL) {
+    	tst_stem = baseNameCheck(s,"collect_dbase_dirs","INDEXDIR") ;
+   		if (!strcmp(tst_stem,".")) {
+			tst_stem = pwddir ;  /*bluntly translates */
+		}
+		size_t tst_stem_len = strlen(tst_stem ) + 1 ;	
+		indexdir_varpath = (char *) ymalloc(tst_stem_len,"collectDbaseDirs","indexdir_varpath") ; 
+		fn_status = (fn_status | D_INDEXDIR) ;
+		/* But it has to resolve to something */
+		strcpy(indexdir_varpath, s);
+		tst_stem = NULL ;	
+	}
+
+	/* collects the home directory. */
+	if ((s = getenv("HOME")) == NULL) {
+		yerror(YPTH_NOPWD_ERR,"collect_dbase_dirs","$HOME",YX_EXTERNAL_CAUSE ) ;
+	}
+	size_t home_slen = strlen(s) +  strlen(INDEXDIR) + 2 ;
+	
+	indexhomedir = (char *) ymalloc(home_slen,"collectDbaseDirs","indexhomedir") ; 
+	fn_status |= D_HOMEDIR ;
+	/* TODO: We shouldn't set D_HOMEDIR IF D_INDEXDIR IS SET ??? */
+	/* Make name.                                           */
+	strcpy(indexhomedir,s) ;
+	strcat(indexhomedir,"/") ;
+	strcat(indexhomedir,INDEXDIR) ;
    	s = NULL ;
 }
-/* returns the database directory:
-The database directory is mostly where the label file exists.
-If we are getting here, by specifying a file with a path on the commandline
-where the label file doesn't exist. And an empty dbase file, then we are not
-entering the select db routine, that lets us create the database file.
-This particular situation, should be handled in the read_label file.
-But I am not sure if it can be handled any better than today.
 
-(This is the special case with F_FULL_PATH) then we will have to creat ethe file from there
- in open index file. )
+/*
+returns the directory where we should look for files. 
+it is either the INDEXDIR directory, or the $HOME./index
+directory if the former isn't set.
+   
+It will be used under all circumstances for finding label
+files. It won't be used for the db-file, if the path to that 
+file is set on the commandline. Then F_FULL_PATH is set.
 
-
-It must be better to flat out create the dbfile when we can't find it, than it is
-to die with an error message.
-
-If we programmed it like this: then we would have to
-
-
-*/
-/* returns the directory, from which we retrieve db files
-when we are called from  load_dblist.
-This is really only a matter of returning directories:
-if the INDEXDIR directory is set, then we return that one.
-if not, then we retrieve the INDEXHOMEDIR directory
-($HOME/.index). Those directories have been gathered up front
-with collect_dbase_dirs(). this function should really have 
-been called first, but you can always check to see if pointers
-are NULL, before returning a directory.
+If it is set to INDEXDIR, then $HOME/.index will be used 
+as a fall back for the label file if the full path to the
+database file is specified on the commandline.
+   
+It will always return one or the other of those two directories.
+This directory governs the place to look for db files, label
+files, and also where a new db file without a path is created.
+ 	
+Those directories have been gathered up front with
+collect_dbase_dirs().
 */
 char *
 get_dbase_dir(void )
@@ -199,10 +258,9 @@ get_dbase_dir(void )
 	}
 }
 
-
 /* 	Returns a filepointer, after we have tried to open the
    	dbfile, (open_db() is the only caller).
-	If it finds the file.db then i saves the full name of it
+	If it finds the file.db then it saves the full name of it
 	in the fulldbname, and sets the flag: F_FULL_PATH so we 
 	know that we just can fetch it there, without further
 	tracking.
@@ -241,10 +299,11 @@ openLabelFileFromDir(char *fname, char *filedir )
 		}
 		return fp ;
 }
-/* makes a filename from a suffix,basename and directory,
-   must free memory afterwards.
 
-   TODO: could this have been used more often???
+/*
+makes a filename from a suffix,basename and directory,
+must free memory afterwards.
+TODO: could this have been used more often???
 */
 static char *
 makeAfilenameFromStem(const char *suffix, char *fname, char *filedir)
@@ -269,8 +328,9 @@ makeAfilenameFromStem(const char *suffix, char *fname, char *filedir)
 	strcat(tmpfname,suffix) ;
 	return tmpfname ;
 }
-/* makes a filename from a basename and directory,
-   must free memory afterwards.
+/*
+makes a filename from a basename and directory,
+must free memory afterwards.
 */
 static char *
 makeAfilename( char *fname, char *filedir)
@@ -293,10 +353,11 @@ makeAfilename( char *fname, char *filedir)
 	return tmpfname ;
 }
 
-/* Returns a file pointer to the open db, or dies trying to open it
-  it will try to open it one or two places, according to the constituency
-  of the filename. Is the only user of openFromDir, which sets the fulldbname
-  as a nice side-effect.
+/*
+Returns a file pointer to the db to open , or dies trying to open it.
+It will try to open it one or two places, according to the constituency
+of the filename. Is the only user of openFromDir, which sets the fulldbname
+as a side-effect. It is called only from read_db.
 
   TODO:
   Once we see that we can open the file, we'll set the directory accordingly.
@@ -331,18 +392,17 @@ open_db(void)
 			that are called before this routine. so if it isn't here: ERR! */
 	} else if (fn_status & L_CREATED ) {
 		/* if an index file has been created, and we come here,
-		the we are started up from the ui.
+		then we are started up from the ui.( interesting fact.)
 	
 		It works this way: if the index file were first, then 
 		the "new file process" was initiated from the ui.
-
 
 		we could of course simply logic and create 
 		file when we have created the index file in dbselect.
 
 		I am not sure what is logically worst, but making it in
 		the dbselect is kind of simpler logically.
-		We are going for dbeselect first, but maybe getting back here. mark b
+		We are going for dbeselect first, but maybe getting back here.
 		*/
 
 		/* !! label file has been created and exists, make corresponding 
@@ -361,9 +421,7 @@ open_db(void)
 					tmpfname = makeAfilename(basedbname,indexdir_varpath ) ;	
 				if ((fp = fopen(tmpfname, "w")) == NULL) {
 					/* print error message and die */
-					perror("Couldn't create dbfile in open_db") ;
-					finish(0) ;
-					exit( YX_EXTERNAL_CAUSE ) ;
+					yerror(YFILE_CREAT_ERR,"open_db",tmpfname,YX_EXTERNAL_CAUSE ) ;
 				} else {
 					fulldbname = tmpfname ;
 					tmpfname = NULL ;
@@ -380,9 +438,7 @@ open_db(void)
 					tmpfname = makeAfilename(basedbname,indexhomedir ) ;	
 					if ((fp = fopen(tmpfname, "w")) == NULL) {
 						/* print error message and die */
-						perror("Couldn't create dbfile in open_db") ;
-						finish(0) ;
-						exit( YX_EXTERNAL_CAUSE ) ;
+						yerror(YFILE_CREAT_ERR,"open_db",tmpfname,YX_EXTERNAL_CAUSE ) ;
 					} else {
 						fulldbname = tmpfname ;
 						tmpfname = NULL ;
@@ -411,8 +467,9 @@ open_db(void)
 				return fp ;
 		}
     }
+	/* TODO: after implementing varags or something. */
     fprintf(stderr,"open_db: didn't find any dbfile that matched the name given.\n") ;
-	release_filenames() ;
+	finish(0) ;
 	exit(YX_USER_ERROR ) ;
 }
 
@@ -426,7 +483,7 @@ justCreated(void) {
 	}
 }
 
-/* 	Set that we have creted a label file
+/* 	Set that we have created a label file
 	for the case of giving a new filename on the commandline.
 */
 void
@@ -446,11 +503,12 @@ labelFileIsJustCreated(void )
 	}
 }
 
-/* 	Returns 1 if the index file exists, 0 otherwise.
-	This function is called from select_dbfile, so it can only deal with files
-	existing in one or two directories, either the PATH pointed to by the INDEXDIR
-	variable, or from INDEXHOMEDIR. It saves a pointer to the label file if it
-	finds it as a nice side-effect.
+/* 
+Returns 1 if the index file exists, 0 otherwise.
+This function is called from select_dbfile, so it can only deal with files
+existing in one or two directories, either the PATH pointed to by the INDEXDIR
+variable, or from INDEXHOMEDIR. It saves a pointer to the label file if it
+finds it as a nice side-effect.
 */
 int
 labelFileExists(wchar_t * dbname)
@@ -458,7 +516,6 @@ labelFileExists(wchar_t * dbname)
 	struct stat st;
 	int success= 0 ;
 	char * lblfname = wcstombs_alloc(dbname) ;
-	/* TODO: check if this is right */
 
 	size_t lblfnamelen = strlen(lblfname) + strlen(IDXFILE_SUFFIX) + 1 ;
 	lblfname = (char *) yrealloc(lblfname, lblfnamelen,
@@ -496,23 +553,27 @@ labelFileExists(wchar_t * dbname)
 		fn_status |= L_FULL_PATH ;
 		fulllabelname = lblfile ;
 		lblfile = NULL ;
-		/* TODO: Expriment and uncomment, if this one is the only one, getting to be null */ 
 	}
 	return success ;
 }
 
-/*  constructs a valid label_filename and returns a pointer to it.
-	According to the following rules:	
+/* 
+Constructs a valid label_filename and returns a pointer to it.
+
+According to the following rules:	
+
 	We don't consider any full path, just if we have the INDEXDIR
 	directory variable set in the environment or not.
+
 	If INDEXDIR is set before invocation, then that is the path we
-	use for the label file, if not we create it in $HOME/.index */
+	use for the label file, if not we create it in $HOME/.index
+*/
 char *
 newLabelFilePath(void) 
 {
 	if (!(fn_status & F_GOTFNAME )) {
 		fprintf(stderr,"newLabelFilePath: stemdbname not set before calling me.\n") ;
-		releaseProgramName() ;
+		finish(0) ;
 		exit(YX_EXTERNAL_CAUSE ) ;
 	} 
 	/* we really don't consider the filename */
@@ -527,7 +588,7 @@ newLabelFilePath(void)
 	return fulllabelname ;
 }
 /* returs a previously set fullabelFilename
-   TODO: evaluate if this one is to be make like getBackupFilename below.
+   TODO: evaluate if this one is to be made like getBackupFilename below.
    When in doubt any caller should look if the L_CREATED flag is set.
 */
 char *
@@ -536,16 +597,15 @@ getFullLabelFileName(void)
 	if ( fulllabelname == NULL ) {
 		fprintf(stderr,"getFullLabelFileName: fullabel name not set.\n") ;
 		/* TODO: implement finish in this one. */
-		release_filenames() ;
+		finish(0) ;
 		exit(YX_EXTERNAL_CAUSE ) ;
 	}
 	return fulllabelname ;
 }
-/* returns the name for the backup file.
-Creates the name if it doesnt exist, uses
-Emacs naming scheme for backup files.
-This way of creating a bacukup filename deviates. so we can't use any
-"higher level routines"
+/*
+Returns the name for the backup file.
+(Adds "~" at end of .db name.)
+Creates the name if it doesnt exist.
 */
 char *
 getBackupFileName(void)
@@ -561,19 +621,27 @@ getBackupFileName(void)
 	}
 	return bckdbname ;
 }
-/* returns the fulldbname; a caller should check the flags. */
+/*
+Returns the fulldbname.
+A caller should check the flag F_FULL_PATH
+before calling it. (dbFileHasNoPath).
+There isn't much use of a dbfile before it has
+a full db name, which is the full path to the file.
+*/
 char *
 getFullDbName(void)
 {
 	if ( fulldbname == NULL ) {
 		fprintf(stderr,"getFullDbName: fulldbname name not set.\n") ;
-		/* TODO: implement finish in this one. */
-		release_filenames() ;
+		finish(0) ;
 		exit(YX_EXTERNAL_CAUSE ) ;
 	}
 	return fulldbname ;
 }
 
+/*
+Returns true if the dbfile is resolved with a full path.
+*/
 int
 dbFileHasNoPath(void ) 
 {
@@ -583,52 +651,29 @@ dbFileHasNoPath(void )
 		return 0 ;
 	}
 }
+
+
 /*
- TODO: Dynamic memory management of the db_records.
- * Hen and egg problems, since, for the sake of good memory managment
- we have to first open the dblabelFile, and find the number of labels,
- which governs the number of fields. 
+Returns a file pointer to the open label file.  Or NULL if we
+didn't find an existing file.
 
- we are going to return that number, so we can allocate more memory
- dynamically.
+It is called from read_labelfile() .  If the label file has been
+created just before we are called, then the flag F_LABEL_MADE is
+set, and we can return the path immediately.
 
- TODO: Document this somewhere.
-
- Same labels different files, that is what those changes leads to.
- returns a filepointer to an label file, or dies trying:
-
-TODO:
-If it can't find a freshly created label file,(F_LABEL_MADE) (set_label_file)
-then it dies with an error message.
-
-On the other hand, if it figures, that the specified db file, doesn't yet exist,
-Then it knows for sure that its label file, should be created.
-
-
-this will never make it with a message to the console, as we 
-will create a new file and label file, before we errors on the opening,
-and then, it should exist. except for errors after creating a new file.*/
-
-
-/* 	Returns a file pointer to the open label file.  Or NULL if we
-	didn't find an existing file.
-
-	It is called from read_labelfile() .  If the label file has been
-	created just before we are called, then the flag F_LABEL_MADE is
-	set, and we can return the path immediately.
-
-	Likewise, if labelFileExists has found the label file, then the
-	flag: L_FULL_PATH has been set, and we can retrieve the file
-	automatically. It returns NULL if it cant find a label file.
-	If this happens in read_labelfile(), then read_label file will
-	create an error message if the db file doesn't exist yet, or
-	die with an error message if it does. 
+Likewise, if labelFileExists has found the label file, then the
+flag: L_FULL_PATH has been set, and we can retrieve the file
+automatically. It returns NULL if it cant find a label file.
+If this happens in read_labelfile(), then read_label file will
+create an error message if the db file doesn't exist yet, or
+die with an error message if it does. 
  
- 	In some cases now, if you manage two kinds of files with the same
-	name, and forgets to specify the INDEXDIR, then you may end up with
-	some trouble. We find a path to a db file, but no INDEXDIR FILE,so
-	we are getting an error message.
-	TODO: incorporate this suggestion into the error message.
+In some cases now, if you manage two kinds of files with the same
+name, and forgets to specify the INDEXDIR, then you may end up with
+some trouble. We find a path to a db file, but no INDEXDIR FILE,so
+we are getting an error message.
+
+TODO: incorporate this suggestion into the error message.
 	*/
 FILE *
 open_label_file(void)
@@ -641,7 +686,7 @@ open_label_file(void)
 		if ((fp = fopen(fulllabelname, "r")) == NULL ) {
             fprintf(stderr,"open_label_file(): didn't find label file, supposed to have  beeen just created.\n") ;
 			/* TODO: this one definately to the console */
-        	release_filenames() ;
+        	finish(0) ;
         	exit(YX_USER_ERROR ) ;
         
 		} else {
@@ -669,10 +714,14 @@ open_label_file(void)
 	}
 	return NULL ;
 }
-/* business rules used in openLabeFile() from dbio.c
-   It is ok to create the label file, if we are in the process
-   of creating a new dbase file, specified from the command line.
- */
+ 
+/*
+Returns true if we should create the missing label file.
+It is ok to create the label file, if we are in the process
+of creating a new dbase file, specified from the command line,
+Or creating a new dbase file thru the user interface.
+--Business rules used in openLabeFile() from dbio.c
+*/
 int
 shouldCreateMissingLabelFile(void) 
 {
@@ -693,12 +742,15 @@ shouldCreateMissingLabelFile(void)
 		}
 	} else {
 		fprintf(stderr,"shouldCreateMissingLabelFile: No full path so won't bother\n") ;
-		release_filenames() ;
+		finish(0) ;
 		exit(YX_EXTERNAL_CAUSE ) ;
 	}
 }
 
-/* we own the name here, as that is easier to work with. */
+/*
+Sets the dbfiltername with one
+supplied from the command line.
+*/
 void
 set_dbfilter( char *filtername ) 
 {
@@ -707,6 +759,10 @@ set_dbfilter( char *filtername )
 	fn_status |= F_HAS_FILTER ;
 	strcpy(dbfilter,filtername) ;
 }
+/*
+Returns true if there were a dbfilter name
+supplied from the command line.
+*/
 int
 has_dbfilter(void) 
 {
@@ -717,12 +773,14 @@ has_dbfilter(void)
 	}
 }
 
-/* returns filepointer to dbfilter supplied from command-line.
-	for one, there is no correlation between names, and we have to set the name somewhere.
-	secondly: the behaviour here is more like open_db, and it is possible to have the filter
-	stored locally here as well. The second thing, is the thing with relative paths.
-		We may equally well have to resolve a relative path.
-	thirdly:the filter may be without, or have a totally different suffix.
+/*
+Returns filepointer to dbfilter supplied from command-line.
+
+for one, there is no correlation between names, and we have to set the name somewhere.
+secondly: the behaviour here is more like open_db, and it is possible to have the filter
+stored locally here as well. The second thing, is the thing with relative paths.
+We may equally well have to resolve a relative path.
+thirdly:the filter may be without, or have a totally different suffix.
 
 
 	TODO: if not found, returns bare filter name, so it can be searched for through
@@ -735,7 +793,6 @@ has_dbfilter(void)
 	so this is just for label files, and, but mainly for dbfiles.
    if we are to make this to work from here, then we'd better send with the
    constant, so we can know which full filenemae to set!
-
 */
 char *
 open_dbfilter(void)
@@ -750,20 +807,8 @@ open_dbfilter(void)
 	struct stat st;
 	int onlystem=0 ;
 	char *resultptr = NULL ;
-	char * basefiltername=basename(dbfilter), *completeBaseName = NULL ;
-	/* TODO: refactor out */
-	/* precautionary tests */
-	if ( basefiltername == NULL ) {
-		release_filenames();
-		perror("open_dbfilter(), path too long.") ;
-		exit(YX_USER_ERROR) ;
-	} else  if (!strcmp(basefiltername,".")) {
-		fprintf(stderr,"open_dbfilter(): \".\" is not a valid filename\n") ;
-		exit(YX_USER_ERROR) ;
-	} else  if (!strcmp(stemdbname,".")) {
-		fprintf(stderr,"open_dbfilter(): \"/\" is not a valid filename\n") ;
-		exit(YX_USER_ERROR) ;
-	}
+	char *completeBaseName = NULL ;
+    char * basefiltername = extBasenameCheck(dbfilter,"open_dbfilter","dbfilter") ;
 	
 	if (strstr(dbfilter,FMTFILE_SUFFIX)==NULL) {
 		onlystem = 1 ;
@@ -913,14 +958,16 @@ _ffilt:
 		if (! error_code ) {
 			return resultptr;
 		} else {
-			release_filenames() ;
+			finish(0) ;
 			exit(error_code ) ;
 		}		
 
 	}
 }
 
-/* returns true if no dbase_name have been given from commandline */
+/*
+Returns true if no dbase_name have been given from commandline.
+*/
 int no_dbase_name(void)
 {
 	if ((fn_status & F_GOTFNAME ) == 0 ) {
@@ -930,9 +977,10 @@ int no_dbase_name(void)
 	}
 }
 
-/* TODO: it should be fairly easy for us to know which directory we are listing files from
-so we can complete this function */
-
+/*
+TODO: it should be fairly easy for us to know which directory we are listing files from
+so we can complete this function.
+*/
 void
 set_dbase_shortname( wchar_t *dbname )
 {
@@ -953,7 +1001,10 @@ set_dbase_shortname( wchar_t *dbname )
 	fn_status |= F_ARGVNAME ;
 }
 
-/* returns the shortdb wchar_t name, will only be used from main. */
+/*
+Returns the shortdb wchar_t name,
+will only be used from main.
+*/
 wchar_t *
 get_dbase_name(void)
 {
@@ -1032,20 +1083,8 @@ set_dbase_name(char *dbasearg)
 	int dbaseargIsStem = 0 ;
 	
 	fn_status |= (F_GOTFNAME | F_ARGVNAME )  ;
-	stemdbname = basename(dbasearg) ;
-	
-	/* precautionary tests */
-	if ( stemdbname == NULL ) {
-		release_filenames();
-		perror("set_dbase_name, path too long.") ;
-		exit(YX_USER_ERROR) ;
-	} else  if (!strcmp(stemdbname,".")) {
-		fprintf(stderr,"set_dbase_name: \".\" is not a valid filename\n") ;
-		exit(YX_USER_ERROR) ;
-	} else  if (!strcmp(stemdbname,".")) {
-		fprintf(stderr,"set_dbase_name: \"/\" is not a valid filename\n") ;
-		exit(YX_USER_ERROR) ;
-	}
+	stemdbname = extBasenameCheck(dbasearg,"set_dbasename","dbasearg") ;
+	/* stemdbname gets malloce'd and copied over below! */
 
 	/* checks if stem and the full argument are alike */
 	if (!strcmp(stemdbname,dbasearg)) {
@@ -1133,17 +1172,17 @@ static char
 		char *myhome = getenv("HOME");	/* First we'll have to get our name */
 
 		if (myhome == NULL) {
-			release_filenames();
 			fprintf(stderr,
 				"tildeExpandFileName: $HOME variable not set. Exiting.\n");
+			finish(0);
 			exit(YX_USER_ERROR);
 		}
 		size_t hlen = strlen(myhome);
 
 		if (hlen == 1) {
-			release_filenames();
 			fprintf(stderr,
 				"tildeExpandFileName: I can't resolve a users path while we are  logged on as root.\n");
+			finish(0);
 			exit(YX_EXTERNAL_CAUSE);
 		}
 		char *userpath = (char *) ymalloc((hlen+slen),"tildeExpandedFileName","userpath") ; 

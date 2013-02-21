@@ -51,7 +51,11 @@
 #define YREALLOC_ERR 1
 #define YICU_CONV_ERR 2
 #define YMBS_WCS_ERR 3
-  
+#define YPTH_TOOLONG_ERR 4
+#define YPTH_ISROOT_ERR 5
+#define YPTH_ISPWD_ERR 6
+#define YPTH_NOPWD_ERR 7
+#define YFILE_CREAT_ERR 8
 /* constants for painting the screen correctly */
 
 #define STARTROW 4
