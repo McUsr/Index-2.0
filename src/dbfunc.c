@@ -100,6 +100,7 @@ static const char *disp_menu[] = {
 /* user choose what to do with the entry.                       */
 void disp_entries(void)
 {
+    const char procname[]="disp_entries" ;
 	int first, save = -1;
 	register int i, j;
 	register wchar_t ch;
@@ -146,7 +147,8 @@ void disp_entries(void)
                      wcsFromUnicode_alloc((size_t *) &tmp.db_lens[j], db[i].db_lines [j],
                          db[i].db_lens [j]);
 				if (tmp.db_lines[j] == NULL) {
-					memerrmsg("disp_entries");
+                    /* this may be something different from the layer below */
+                    yerror(YMALLOC_ERR,procname,"tmp.db_lines[j]",YX_EXTERNAL_CAUSE ) ;
 				}
 			} else {
 				tmp.db_lens[j] = 0;
@@ -212,10 +214,7 @@ void disp_entries(void)
 					      sizeof(dbrecord),
 					      (compFunc) dbsort);
 				} else {
-					fprintf(stderr,
-						"%s : read_database: couldn't create a collator.\n",
-						getProgramName());
-					exit(1);
+                    y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
 				}
 				ucol_close(compareCollator);
 
@@ -292,6 +291,7 @@ void disp_entries(void)
 /* add an entry to database.                                */
 void add_entry(void)
 {
+    const char procname[]="add_entry" ;
 	register int i;
 	/* Search for an empty entry in array.                  */
 	for (i = 0; i < dbsize; i++) {
@@ -317,10 +317,7 @@ void add_entry(void)
 					      sizeof(dbrecord),
 					      (compFunc) dbsort);
 				    } else {
-					    fprintf(stderr,
-						    "%s : read_database: couldn't create a collator.\n",
-						    getProgramName());
-					    exit(1);
+                        y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
 				    }
 				    ucol_close(compareCollator);
                 }
@@ -333,7 +330,7 @@ void add_entry(void)
 	dbsize *= 2;
 
 	if ((db = realloc(db, dbsize * sizeof(dbrecord))) == NULL) {
-		memerrmsg("add_entry allocating more space");
+        yerror(YREALLOC_ERR,procname,"db",YX_EXTERNAL_CAUSE ) ;
 	}
     memset(&db[dbentries],(int) 0, sizeof(dbrecord)); 
 	/* Let user edit new entry.                              */
@@ -351,10 +348,7 @@ void add_entry(void)
 			qsort(db, (size_t) dbentries, sizeof(dbrecord),
 			      (compFunc) dbsort);
 		} else {
-			fprintf(stderr,
-				"%s : read_database: couldn't create a collator.\n",
-				getProgramName());
-			exit(1);
+            y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
 		}
 		ucol_close(compareCollator);
 	}
@@ -399,10 +393,7 @@ void read_db(void)
 		qsort(db, (size_t) dbentries, sizeof(dbrecord),
 		      (compFunc) dbsort);
 	} else {
-		fprintf(stderr,
-			"%s : read_database: couldn't create a collator.\n",
-			getProgramName());
-		exit(1);
+        y_icuerror( YICU_CRECOLL_ERR, "read_db", "compareCollator", status ) ;
 	}
 	ucol_close(compareCollator);
 

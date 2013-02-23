@@ -20,6 +20,7 @@ extern int      dbentries;      /* number of entries in db      */
 extern int      dbsize;         /* size of db array             */
 void 			set_reverse(void) ;
 void 			read_labelfile(void) ;
+int 			labelFileOkAfterLinting(char *labelfn)  ;
 int 			file_is_empty( char *filename) ;
 void 			remove_unwanted_file( void ) ;
 void            release_idx(void) ;

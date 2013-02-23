@@ -158,6 +158,7 @@ void find_entry(void)
 
 			/* There was an error in the RE.                     */
 			mvaddwstr((LINES / 2) - 2, 0, wpattern);
+            /* TODO: Must be made to conform with the error system.  */
 			prompt_char(LINES / 2, 0,
 				    "There was an error in the reg-exp pattern, type RETURN to continue: ",
 				    "\n\r");
@@ -217,9 +218,7 @@ int search_db(UChar * src_pattern, int32_t plen)
 	status = U_ZERO_ERROR;
 	new_regex = uregex_open(src_pattern, plen, flags, &pe, &status);
 	if (U_FAILURE(status)) {
-		fprintf(stderr,
-			"something erred during compilation of regexp\n");
-		return -1;
+        y_icuSimpleError( "Index: something erred during compilation of regexp" ,status);
 	}
 	/* For all entries...                                               */
 
@@ -242,11 +241,8 @@ int search_db(UChar * src_pattern, int32_t plen)
 				uregex_setText(new_regex, db[i].db_lines[j], -1,
 					       &status);
 				if (!U_SUCCESS(status)) {
-
-					fprintf(stderr,
-						"something erred during  SETTING TEXT  of regexp\n");
-					/* icuFunctionError(p, "uregex_setText", status); */
-					return -1;
+                        y_icuSimpleError(
+						"Index: something erred during  SETTING TEXT  of regexp" ,status);
 				} else {
 					if (uregex_find(new_regex, 0, &status)
 					    == TRUE) {

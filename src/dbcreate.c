@@ -114,12 +114,7 @@ create_db(void)
 
 	/* Spawn a child process.  */
 	if ((pid = fork()) < 0) {
-		char emi[BUFSIZ];
-
-		sprintf(emi, "%s: cannot fork", getProgramName());
-		reset_modes();
-		perror(emi);
-		exit(1);
+        yerror(YFORK_PROC_ERR,"create_db",editor,YX_EXTERNAL_CAUSE ) ;
 	}
 	/* Execute the editor. */
 	if (pid == 0) {

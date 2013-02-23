@@ -61,6 +61,13 @@
 #define YFILE_OREAD_ERR 11
 #define YFILE_FREAD_ERR 12
 #define YFILE_FWRITE_ERR 13
+#define YICU_COLLATO_ERR 14
+#define YICU_CRECOLL_ERR 15
+#define YDIR_OPEN_ERR 16
+#define YPIP_EXEC_ERR 17
+#define YFORK_PROC_ERR 18
+#define YICU_CNVFUTF8_ERR 19
+#define YICU_CNVPREUTF8_ERR 20 
 /* constants for painting the screen correctly */
 
 #define STARTROW 4

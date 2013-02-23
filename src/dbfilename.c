@@ -164,9 +164,8 @@ baseNameCheck( const char* pathToCheck, const char *caller, const char *variable
         yerror( YPTH_TOOLONG_ERR,caller,variable, YX_USER_ERROR ) ;
    	} else  if (!strcmp(basePtr,"/")) {
         yerror( YPTH_ISROOT_ERR,caller,variable, YX_USER_ERROR ) ;
-   	} else { 
-		return basePtr ;
-	}
+   	} 
+	return basePtr ;
 }
 /*
 returns the path from the basename library call, if it isn't NULL, "/" or "."
@@ -188,24 +187,25 @@ TODO: USE PWD FOR "." HERE
 void
 collect_dbase_dirs(void)
 {
+	const char procname[]="collect_dbase_dirs" ;
 	char *s = NULL;
 	/* and finally, we gather the PWD */
 	if ((s = getenv("PWD")) == NULL) { /* This *SHOULD* work in most situation */
-		yerror(YPTH_NOPWD_ERR,"collect_dbase_dirs","$PWD",YX_EXTERNAL_CAUSE ) ;
+		yerror(YPTH_NOPWD_ERR,procname,"$PWD",YX_EXTERNAL_CAUSE ) ;
 	}
 	size_t pwdlen = strlen(s) + 2 ;
-	pwddir = (char *) ymalloc(pwdlen,"collectDbaseDirs","pwddir") ; 
+	pwddir = (char *) ymalloc(pwdlen,procname,"pwddir") ; 
 	strcpy(pwddir,s) ;
 	strcat(pwddir,"/") ;
 	char *tst_stem= NULL ;
 	/* if defined, then this is where we are looking for db's */
 	if ((s = getenv("INDEXDIR")) != NULL) {
-    	tst_stem = baseNameCheck(s,"collect_dbase_dirs","INDEXDIR") ;
+    	tst_stem = baseNameCheck(s,procname,"INDEXDIR") ;
    		if (!strcmp(tst_stem,".")) {
 			tst_stem = pwddir ;  /*bluntly translates */
 		}
 		size_t tst_stem_len = strlen(tst_stem ) + 1 ;	
-		indexdir_varpath = (char *) ymalloc(tst_stem_len,"collectDbaseDirs","indexdir_varpath") ; 
+		indexdir_varpath = (char *) ymalloc(tst_stem_len,procname,"indexdir_varpath") ; 
 		fn_status = (fn_status | D_INDEXDIR) ;
 		/* But it has to resolve to something */
 		strcpy(indexdir_varpath, s);
@@ -214,11 +214,11 @@ collect_dbase_dirs(void)
 
 	/* collects the home directory. */
 	if ((s = getenv("HOME")) == NULL) {
-		yerror(YPTH_NOPWD_ERR,"collect_dbase_dirs","$HOME",YX_EXTERNAL_CAUSE ) ;
+		yerror(YPTH_NOPWD_ERR,procname,"$HOME",YX_EXTERNAL_CAUSE ) ;
 	}
 	size_t home_slen = strlen(s) +  strlen(INDEXDIR) + 2 ;
 	
-	indexhomedir = (char *) ymalloc(home_slen,"collectDbaseDirs","indexhomedir") ; 
+	indexhomedir = (char *) ymalloc(home_slen,procname,"indexhomedir") ; 
 	fn_status |= D_HOMEDIR ;
 	/* TODO: We shouldn't set D_HOMEDIR IF D_INDEXDIR IS SET ??? */
 	/* Make name.                                           */
@@ -368,6 +368,7 @@ as a side-effect. It is called only from read_db.
 FILE *
 open_db(void) 
 {
+	const char procname[]="open_db" ;
 	FILE *fp = NULL ;
 	char *tmpfname ;
 	/* Decude how we got here, from selectdb or commandline */
@@ -381,7 +382,7 @@ open_db(void)
 				return fp ;
 			} else { /* it is a file that doesn't exist */
 				if ((fp = fopen(fulldbname, "w")) == NULL) {
-					factionerrmsg(fulldbname, "create");
+					yerror(YFILE_CREAT_ERR,procname,fulldbname,YX_EXTERNAL_CAUSE ) ;
 				} else { 
 					fn_status |= F_CREATED ;
 					return fp ;
@@ -421,7 +422,7 @@ open_db(void)
 					tmpfname = makeAfilename(basedbname,indexdir_varpath ) ;	
 				if ((fp = fopen(tmpfname, "w")) == NULL) {
 					/* print error message and die */
-					yerror(YFILE_CREAT_ERR,"open_db",tmpfname,YX_EXTERNAL_CAUSE ) ;
+					yerror(YFILE_CREAT_ERR,procname,tmpfname,YX_EXTERNAL_CAUSE ) ;
 				} else {
 					fulldbname = tmpfname ;
 					tmpfname = NULL ;
@@ -438,7 +439,7 @@ open_db(void)
 					tmpfname = makeAfilename(basedbname,indexhomedir ) ;	
 					if ((fp = fopen(tmpfname, "w")) == NULL) {
 						/* print error message and die */
-						yerror(YFILE_CREAT_ERR,"open_db",tmpfname,YX_EXTERNAL_CAUSE ) ;
+						yerror(YFILE_CREAT_ERR,procname,tmpfname,YX_EXTERNAL_CAUSE ) ;
 					} else {
 						fulldbname = tmpfname ;
 						tmpfname = NULL ;
@@ -465,12 +466,10 @@ open_db(void)
 		
 		if( (fp = openFromDir(basedbname, indexhomedir ) ) != NULL ) {
 				return fp ;
+		} else {
+			yerror(YFILE_FINDF_ERR,procname,basedbname,YX_EXTERNAL_CAUSE ) ;
 		}
     }
-	/* TODO: after implementing varags or something. */
-    fprintf(stderr,"open_db: didn't find any dbfile that matched the name given.\n") ;
-	finish(0) ;
-	exit(YX_USER_ERROR ) ;
 }
 
 /* returns 1 True if the db file has ben created */
@@ -513,20 +512,21 @@ finds it as a nice side-effect.
 int
 labelFileExists(wchar_t * dbname)
 {
+	const char procname[]="labelFileExists" ;
 	struct stat st;
 	int success= 0 ;
 	char * lblfname = wcstombs_alloc(dbname) ;
 
 	size_t lblfnamelen = strlen(lblfname) + strlen(IDXFILE_SUFFIX) + 1 ;
 	lblfname = (char *) yrealloc(lblfname, lblfnamelen,
-			"labelFileExists","lblfname") ;
+			procname,"lblfname") ;
 	strcat(lblfname,IDXFILE_SUFFIX) ;
 	char *lblfile = NULL; 
 	if (fn_status & D_INDEXDIR ) {
 		lblfile = makeAfilename( lblfname, indexdir_varpath) ;
 		if (stat(lblfile, &st) == 0) {
 			size_t dir_len = strlen(indexdir_varpath) + 1 ;
-			fulldbdir = (char *) ymalloc(dir_len,"labelFileExists","fulldbdir") ; 
+			fulldbdir = (char *) ymalloc(dir_len,procname,"fulldbdir") ; 
 			strcpy(fulldbdir,indexdir_varpath) ;
 			success = 1 ;
 		}
@@ -539,7 +539,7 @@ labelFileExists(wchar_t * dbname)
 		lblfile = makeAfilename( lblfname, indexhomedir) ;
 		if (stat(lblfile, &st) == 0) {
 			 size_t dir_len = strlen(indexhomedir) + 1 ;
-			fulldbdir = (char *) ymalloc(dir_len,"labelFileExists","fulldbdir") ; 
+			fulldbdir = (char *) ymalloc(dir_len,procname,"fulldbdir") ; 
 			strcpy(fulldbdir,indexhomedir) ;
 			success = 1 ;
 		}
@@ -572,9 +572,7 @@ char *
 newLabelFilePath(void) 
 {
 	if (!(fn_status & F_GOTFNAME )) {
-		fprintf(stderr,"newLabelFilePath: stemdbname not set before calling me.\n") ;
-		finish(0) ;
-		exit(YX_EXTERNAL_CAUSE ) ;
+		ysimpleError("newLabelFilePath: stemdbname not set before calling me.",YX_EXTERNAL_CAUSE) ;
 	} 
 	/* we really don't consider the filename */
 	if ( fn_status & D_INDEXDIR ) {
@@ -595,10 +593,7 @@ char *
 getFullLabelFileName(void) 
 {
 	if ( fulllabelname == NULL ) {
-		fprintf(stderr,"getFullLabelFileName: fullabel name not set.\n") ;
-		/* TODO: implement finish in this one. */
-		finish(0) ;
-		exit(YX_EXTERNAL_CAUSE ) ;
+		ysimpleError("getFullLabelFileName: fullabel name not set.",YX_EXTERNAL_CAUSE) ;
 	}
 	return fulllabelname ;
 }
@@ -641,7 +636,7 @@ char *
 getFullDbName(void)
 {
 	if ( fulldbname == NULL ) {
-		fprintf(stderr,"getFullDbName: fulldbname name not set.\n") ;
+		ysimpleError("getFullDbName: fulldbname name not set.",YX_EXTERNAL_CAUSE) ;
 		finish(0) ;
 		exit(YX_EXTERNAL_CAUSE ) ;
 	}
@@ -687,17 +682,14 @@ TODO: incorporate this suggestion into the error message.
 FILE *
 open_label_file(void)
 {
+	const char procname[]="open_label_file";
 	FILE *fp;
 
 	if ((fn_status & L_FULL_PATH )|| (fn_status & F_LABEL_MADE )) {
 	/* 	This is the situation, if we found the index file in
 		the exists_label_file() from within select_db(). */
 		if ((fp = fopen(fulllabelname, "r")) == NULL ) {
-            fprintf(stderr,"open_label_file(): didn't find label file, supposed to have  beeen just created.\n") ;
-			/* TODO: this one definately to the console */
-        	finish(0) ;
-        	exit(YX_USER_ERROR ) ;
-        
+			yerror(YFILE_FINDF_ERR,procname,fulllabelname,YX_USER_ERROR ) ;
 		} else {
 			return fp ;
 		}
@@ -709,7 +701,7 @@ open_label_file(void)
 	
 	size_t baselabelStorage = strlen(stemdbname) + strlen(IDXFILE_SUFFIX) + 1 ;
 	
-	char *baselabelname = (char *) ymalloc(baselabelStorage,"open_label_file","baselabelname") ; 
+	char *baselabelname = (char *) ymalloc(baselabelStorage,procname,"baselabelname") ; 
 	strcpy(baselabelname,stemdbname) ;
 	strcat(baselabelname,IDXFILE_SUFFIX);
 	/* TODO: any advantages of updating the fulldbname variable??? */	
@@ -750,10 +742,9 @@ shouldCreateMissingLabelFile(void)
 			return 1;
 		}
 	} else {
-		fprintf(stderr,"shouldCreateMissingLabelFile: No full path so won't bother\n") ;
-		finish(0) ;
-		exit(YX_EXTERNAL_CAUSE ) ;
+		ysimpleError("shouldCreateMissingLabelFile: No full path so won't bother.",YX_EXTERNAL_CAUSE) ;
 	}
+	return 0 ; /* for compiler */
 }
 
 /*
@@ -813,16 +804,17 @@ open_dbfilter(void)
 		
 		if no path is specified, then that isn't an error.
 	*/
+	const char procname[]="open_dbfilter" ;
 	struct stat st;
 	int onlystem=0 ;
 	char *resultptr = NULL ;
 	char *completeBaseName = NULL ;
-    char * basefiltername = extBasenameCheck(dbfilter,"open_dbfilter","dbfilter") ;
+    char * basefiltername = extBasenameCheck(dbfilter,procname,"dbfilter") ;
 	
 	if (strstr(dbfilter,FMTFILE_SUFFIX)==NULL) {
 		onlystem = 1 ;
 		size_t completefilterlen =strlen(dbfilter)+strlen(FMTFILE_SUFFIX) + 1  ;
-		completeBaseName = (char *) ymalloc(completefilterlen,"open_dbfilter","completeBaseName") ; 
+		completeBaseName = (char *) ymalloc(completefilterlen,procname,"completeBaseName") ; 
 		strcpy(completeBaseName,dbfilter) ;
 		strcat(completeBaseName,FMTFILE_SUFFIX) ;
 	}
@@ -905,13 +897,13 @@ open_dbfilter(void)
 	*/
 		int error_code = 0 ;	
 		char *fullfiltername =tildeExpandedFileName(dbfilter ) ;	
-		char *fullfilterdir = (char *) ymalloc((PATH_MAX +1),"open_dbfilter","fullfilterdir") ; 
+		char *fullfilterdir = (char *) ymalloc((PATH_MAX +1),procname,"fullfilterdir") ; 
     	realpath(fullfiltername,fullfilterdir) ;
 		size_t fullfilterdirlen = strlen(fullfilterdir) ;
 		fullfilterdir = (char *) yrealloc(fullfilterdir, (fullfilterdirlen+1),
-			"open_dbfilter","fullfilterdir") ;
+			procname,"fullfilterdir") ;
     	size_t fullfilterbaselen = fullfilterdirlen +strlen(basefiltername) +2 ;
-		char *fullfilterbase = (char *) ymalloc(fullfilterbaselen,"open_dbfilter","fullfilterbase") ; 
+		char *fullfilterbase = (char *) ymalloc(fullfilterbaselen,procname,"fullfilterbase") ; 
     	strcat(fullfilterdir,"/") ;
 		strcat(fullfilterdir,basefiltername) ;
 		/* HERE */
@@ -919,26 +911,20 @@ open_dbfilter(void)
 			resultptr = fullfilterdir ;
 			goto _ffilt ; /* Adjusted */
 		} else if (!onlystem ) {
-			error_code = YX_USER_ERROR ;
-    		fprintf(stderr,
-				"open_dbfilter: didn't find any filter file that matched the name given.\n") ;
-			goto _fbase;
+			yerror(YFILE_FINDF_ERR,procname,fullfilterbase,YX_USER_ERROR ) ;
 		}
-		char *fullfiltersuffix = (char *) ymalloc((PATH_MAX+1),"open_dbfilter","fullfiltersuffix") ; 
+		char *fullfiltersuffix = (char *) ymalloc((PATH_MAX+1),procname,"fullfiltersuffix") ; 
 		strcpy(fullfiltersuffix,fullfilterdir ) ;
 		strcat(fullfiltersuffix,"/");
 		strcat(fullfiltersuffix,completeBaseName) ;
 		size_t fullfiltersuffixlen = strlen(fullfiltersuffix ) ;
 		fullfiltersuffix = (char *) yrealloc(fullfiltersuffix, (fullfiltersuffixlen+1),
-			"open_dbfilter","fullfiltersuffix") ;
+			procname,"fullfiltersuffix") ;
 		if (stat(fullfiltersuffix, &st) == 0) {
 			resultptr = fullfiltersuffix ;
 			goto _fbase ;
 		} else {
-			error_code = YX_USER_ERROR ;
-    		fprintf(stderr,
-				"open_dbfilter: didn't find any filter file that matched the name given.\n") ;
-			goto _fsuff ;
+			yerror(YFILE_FINDF_ERR,procname,fullfiltersuffix,YX_USER_ERROR ) ;
 		}
 /* New memory deallocation rules:
 	if we find it firs,t then we won't have to dealloc the last.
@@ -949,7 +935,6 @@ open_dbfilter(void)
 
 	The error problems makes it even more difficult.
 */
-_fsuff:
 		free(fullfiltersuffix) ;
 		fullfiltersuffix = NULL ;
 _fbase:
@@ -993,17 +978,17 @@ so we can complete this function.
 void
 set_dbase_shortname( wchar_t *dbname )
 {
-	
+	const char procname[]="set_dbase_shortname" ;	
 	size_t dbnamelen = wcslen(dbname) ;
 	/* we have to convert it back to utf8 */
 	shortdbname = (wchar_t *) ymalloc(((dbnamelen+1)*sizeof(wchar_t)),
-		"set_dbase_shortname","shortdbname") ; 
+		procname,"shortdbname") ; 
 	wcscpy(shortdbname,dbname) ;
 	fn_status |= F_GOTFNAME ;
 	
 	stemdbname = wcstombs_alloc(dbname) ;
 	size_t basedblen = strlen(stemdbname)  + strlen(DBFILE_SUFFIX) + 1 ;
-	basedbname = (char *) ymalloc(basedblen, "set_dbase_shortname","basedbname") ; 
+	basedbname = (char *) ymalloc(basedblen, procname,"basedbname") ; 
 	memset(basedbname,(int) 0, (basedblen*sizeof(wchar_t))) ;	
 	strcpy(basedbname,stemdbname) ; 
 	strcat(basedbname,DBFILE_SUFFIX) ;
@@ -1087,12 +1072,13 @@ release_filenames(void)
 void
 set_dbase_name(char *dbasearg)
 {
+	const char procname[]="set_dbase_name" ;
 	char *filename = NULL, *tmpStem = NULL ;
 	size_t stemdbLen = 0,  basedbLen = 0 ,dbshortLen = 0 ;
 	int dbaseargIsStem = 0 ;
 	
 	fn_status |= (F_GOTFNAME | F_ARGVNAME )  ;
-	stemdbname = extBasenameCheck(dbasearg,"set_dbasename","dbasearg") ;
+	stemdbname = extBasenameCheck(dbasearg,procname,"dbasearg") ;
 	/* stemdbname gets malloce'd and copied over below! */
 
 	/* checks if stem and the full argument are alike */
@@ -1117,16 +1103,16 @@ set_dbase_name(char *dbasearg)
 		basedbLen += strlen(DBFILE_SUFFIX) ;
 	}
 	
-	tmpStem = (char *) ymalloc((stemdbLen+1),"set_dbase_name","tmpStem") ; 
+	tmpStem = (char *) ymalloc((stemdbLen+1),procname,"tmpStem") ; 
 	/* we start out only copying over the part that will populate shortdbname */	
 	strncpy(tmpStem,stemdbname,stemdbLen) ;
 	tmpStem[stemdbLen] = '\0' ; /* needs this */	
 
 	shortdbname = (wchar_t *) ymalloc((dbshortLen * sizeof(wchar_t )) ,
-		"set_dbase_name","shortdbname") ; 
+		procname,"shortdbname") ; 
 	mbstowcs(shortdbname, tmpStem, stemdbLen );
 	fn_status |= F_GOTFNAME ;
-	basedbname = (char *) ymalloc(basedbLen,"set_dbase_name","basedbLen") ; 
+	basedbname = (char *) ymalloc(basedbLen,procname,"basedbLen") ; 
 	
 	strcpy(basedbname,tmpStem) ;
 	strcat(basedbname,DBFILE_SUFFIX ) ;
@@ -1143,7 +1129,7 @@ set_dbase_name(char *dbasearg)
 		relative paths are strings with "./" if a such string is in the path
 		then the path is relative, or may very well be.
 	*/
-	fulldbname = (char *) ymalloc((PATH_MAX+1),"set_dbase_name","fulldbname") ; 
+	fulldbname = (char *) ymalloc((PATH_MAX+1),procname,"fulldbname") ; 
 	/* It seems to resolve the full pathname, not just the dir */
 	realpath(filename,fulldbname) ; /* taker is arg 2 */
 	free(filename );
@@ -1151,18 +1137,18 @@ set_dbase_name(char *dbasearg)
 	
 	size_t full_len = strlen(fulldbname) + 1 + (missingSuffix * strlen(DBFILE_SUFFIX)) ;
 	fulldbname = (char *) yrealloc(fulldbname, full_len,
-			"set_dbase_name","fulldbname") ;
+			procname,"fulldbname") ;
 	
 	if (missingSuffix ) {
 		strcat(fulldbname,DBFILE_SUFFIX ) ;
 	}
 	
-	fulldbdir = (char *) ymalloc((full_len+1),"set_dbase_name","fulldbdir") ; 
+	fulldbdir = (char *) ymalloc((full_len+1),procname,"fulldbdir") ; 
 	strcpy(fulldbdir,fulldbname ) ;
 	strcat(fulldbdir,"/") ;
 	fulldbdir  = dirname(fulldbdir) ;
 	size_t fulldbdirlen = strlen(fulldbdir) + 1 ;
-	fulldbdir = (char *) yrealloc(fulldbdir, fulldbdirlen,"set_dbase_name","fulldbdir") ; 
+	fulldbdir = (char *) yrealloc(fulldbdir, fulldbdirlen,procname,"fulldbdir") ; 
 	fn_status |= F_ARGV_DIR ; /* we got it if we want to look for filters in it. */
 	
 }
@@ -1172,29 +1158,27 @@ that is, when a tilde is set infront of a username. */
 static char
 *tildeExpandedFileName(char *farg)
 {
+	const char procname[]="tildeExpandedFilename" ;
 	/* ok, so we have something that can pass for a a filename */
 	size_t slen = strlen(farg);
-	char *filename = (char *) ymalloc((PATH_MAX+1),"tildeExpandedFileName","filename") ; 
+	char *filename = (char *) ymalloc((PATH_MAX+1),procname,"filename") ; 
 	strcpy(filename, farg);
 	if ((char)filename[0] == '~') {
 		/* if we come here; tilde wasn't alone: followed by a user name. */
 		char *myhome = getenv("HOME");	/* First we'll have to get our name */
 
 		if (myhome == NULL) {
-			fprintf(stderr,
-				"tildeExpandFileName: $HOME variable not set. Exiting.\n");
-			finish(0);
-			exit(YX_USER_ERROR);
+			yerror(YPTH_NOPWD_ERR,procname,"$HOME",YX_USER_ERROR);  
 		}
 		size_t hlen = strlen(myhome);
 
 		if (hlen == 1) {
-			fprintf(stderr,
-				"tildeExpandFileName: I can't resolve a users path while we are  logged on as root.\n");
-			finish(0);
-			exit(YX_EXTERNAL_CAUSE);
+
+		ysimpleError(
+			"tildeExpandFileName: I can't resolve a users path while we are  logged on as root.",
+				YX_EXTERNAL_CAUSE);
 		}
-		char *userpath = (char *) ymalloc((hlen+slen),"tildeExpandedFileName","userpath") ; 
+		char *userpath = (char *) ymalloc((hlen+slen),procname,"userpath") ; 
 
 		/*      This space will always suffice since we loose more than the tilde
 		   if there was just a tilde, like prepending a path, then we will never get it.
@@ -1211,6 +1195,6 @@ static char
 		userpath = NULL;
 	}
 	size_t filenamelen=strlen(filename) ;
-	filename = (char *) yrealloc(filename,filenamelen, "tildeExpandedFileName","filename") ; 
+	filename = (char *) yrealloc(filename,filenamelen, procname,"filename") ; 
 	return filename;
 }

@@ -59,9 +59,9 @@ int main(int argc, char **argv)
 {
 	wchar_t *database = mbstowcs_alloc("test_file");
 
-	if (database == NULL)
+/*	if (database == NULL)
 		memerrmsg("main in dbio.c");
-
+*/
 	/* REMEMBER: set the INDEXDIR environment variable. */
 	setProgramName(*argv);
 	findUtf8OrDie();
@@ -96,7 +96,6 @@ findUtf8OrDie(void)
 		setCollation(collation);
 	}
 }
-
 static void utf8Errmsg(char *prgName, char *curLocale)
 {
 	fprintf(stderr,
@@ -150,9 +149,7 @@ read_labelfile(void)
        create_db() ;
         char *labelfn =  getFullLabelFileName() ; 
         if ( file_is_empty(labelfn) || (!labelFileOkAfterLinting(labelfn))) {
-            fprintf(stderr,"Index: User redecided creating a new database and thereby quitted.\n") ;
-            finish(0) ;
-            exit(0) ;
+            ysimpleError("Index: User redecided creating a new database and thereby quitted.",YX_ALL_WELL) ;
         } 
         /* we remove any trailing line-endings here */
         setLabelFileCreated() ;
@@ -381,13 +378,7 @@ reverse_dbsort(dbrecord * a, dbrecord * b)
 			}
 		}
 	} else {
-		char emi[BUFSIZ];
-
-		sprintf(emi, "%s: dbsort: compareCollator == NULL! ",
-			getProgramName());
-		reset_modes();
-		perror(emi);
-		exit(1);
+        yerror(YICU_COLLATO_ERR,"reverse_dbsort","comparecollator",YX_EXTERNAL_CAUSE ) ;
 	}
 	return (n);
 }
@@ -428,13 +419,7 @@ dbsort(dbrecord * a, dbrecord * b)
 			}
 		}
 	} else {
-		char emi[BUFSIZ];
-
-		sprintf(emi, "%s: dbsort: compareCollator == NULL! ",
-			getProgramName());
-		reset_modes();
-		perror(emi);
-		exit(1);
+        yerror(YICU_COLLATO_ERR,"dbsort","comparecollator",YX_EXTERNAL_CAUSE ) ;
 	}
 	return (n);
 }
@@ -446,7 +431,7 @@ void
 read_database()
 {
 	FILE *fp;
-
+    const char procname[]="read_database" ;
 	register int i;
 
 	char mbsbuf[BUFSIZ] ;	/* 1024 characters per
@@ -465,15 +450,15 @@ read_database()
 	dbsize = MAXDBLINES;
 	dbentries = 0;
 
-	if ((db = (dbrecord *)calloc((size_t) dbsize ,sizeof(dbrecord))) == NULL)
-		memerrmsg("read_database couldn't calloc memory."); /* TODO */
-
+	if ((db = (dbrecord *)calloc((size_t) dbsize ,sizeof(dbrecord))) == NULL) {
+            yerror(YMALLOC_ERR,procname,"db",YX_EXTERNAL_CAUSE ) ;
+    }
 	/* Until we hit end of file...                              */
 	while (!feof(fp)) {
 		/* If we need to, allocate more entries.                */
 		if (dbentries >= dbsize) {
 			dbsize *= 2;
-			db = yrealloc(db, dbsize * sizeof(dbrecord),"read_database","db");
+			db = yrealloc(db, dbsize * sizeof(dbrecord),procname,"db");
 
 		}
 		/* Read in one entry at a time.                         */
@@ -499,7 +484,7 @@ read_database()
 				    unicodeFromUTF8_alloc(&reslen, mbsbuf,
 							  (size_t) mbuflen);
 				if (db[dbentries].db_lines[i] == NULL)
-					memerrmsg("read_database");
+                    yerror(YMALLOC_ERR,procname,"db[dbentries].dblines[i]",YX_EXTERNAL_CAUSE ) ;
 
 				db[dbentries].db_lens[i] = reslen;
 			} else {
@@ -527,10 +512,7 @@ read_database()
             
         }
 	} else {
-		fprintf(stderr,
-			"%s : read_database: couldn't create a collator.\n",
-			getProgramName());
-		exit(1);
+        y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
 	}
 	ucol_close(compareCollator);
 
@@ -541,6 +523,7 @@ read_database()
 /* save the database to disk.                                   */
 void save_db(void)
 {
+    const char procname[] = "save_db" ;
 	FILE *fp;
 
 	struct stat st;
@@ -569,12 +552,12 @@ void save_db(void)
 	if (stat(realfile, &st) == 0) {
 	    int	ret = rename(realfile, bakfile);
         if (ret) {
-           yerror(YFILE_RENMV_ERR,"save_db",bakfile,YX_EXTERNAL_CAUSE ) ; 
+           yerror(YFILE_RENMV_ERR,procname,bakfile,YX_EXTERNAL_CAUSE ) ; 
         }
     }
 	/* Open new file.                                           */
 	if ((fp = fopen(realfile, "w")) == NULL)
-        yerror(YFILE_CREAT_ERR,"save_db",realfile,YX_EXTERNAL_CAUSE ) ; 
+        yerror(YFILE_CREAT_ERR,procname,realfile,YX_EXTERNAL_CAUSE ) ; 
 	/* Make sure database is sorted.                             */
     if (dbentries > 1 ) {
 	    UErrorCode status = U_ZERO_ERROR;
@@ -584,10 +567,7 @@ void save_db(void)
 		    qsort(db, (size_t) dbentries, sizeof(dbrecord),
 	    	      (compFunc) dbsort);
 	    } else {
-		    fprintf(stderr,
-			    "%s : read_database: couldn't create a collator.\n",
-			    getProgramName());
-		    exit(1);
+            y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
 	    }
 	    ucol_close(compareCollator);
     }

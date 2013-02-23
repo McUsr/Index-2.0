@@ -6,6 +6,7 @@
  * Tommy Bollman/McUsr 2013.02.06
  */
 #include <common.h>
+#include <defs.h>
 #include <util.h>
 #include <unicodeToUtf8.h>
 /* Prøver å allokere buffer, men kan ikke se at det skal hjelpe.
@@ -155,8 +156,6 @@ UChar *lowercasedUString(wchar_t *wcsS)
 	UChar *ucs_convertedStr = NULL;
     size_t ucs_len= 0 ; 
 	ucs_convertedStr = unicodeFromWcs_alloc((size_t *) & ucs_len, wcsS);
-	if (ucs_convertedStr == NULL)
-		memerrmsg("lowercasedUString:ucs_convertedStr==NULL");
 	int32_t uchBaseLen = u_strlen(ucs_convertedStr);
 	/* lowercasing may cause more characters.               */
 	UChar *lowerChosenBase = ymalloc((size_t)( uchBaseLen * 2 + 1 ) * sizeof(UChar),
@@ -172,10 +171,9 @@ UChar *lowercasedUString(wchar_t *wcsS)
 	ucs_convertedStr = NULL;
 
 	if (status != U_ZERO_ERROR) {
-		fprintf(stderr,
-			"lowercasedUString: error during lowercase of lowerChosenBase.\n");
 		free(lowerChosenBase);
-		exit(1);
+        y_icuSimpleError(
+            "Index: lowercasedUString: error during lowercase of lowerChosenBase.",status);
 	}
     return  lowerChosenBase ;
 }
@@ -210,6 +208,10 @@ char *
 utf8FromUnicode_alloc(size_t * slen, const UChar * ucsS,
 			    const int32_t ucsLen)
 {
+    /* TODO: burde ha releasing av buffere som virker,
+    problem er at det site allocerte minnet ikke blir frigitt */
+    const char procname[]="utf8FromUnicode_alloc" ;
+    const char bufname[]="buf" ;
 	char *buf;
 
 	int32_t sCap = (int32_t) BUFSIZ * sizeof(char);
@@ -217,7 +219,7 @@ utf8FromUnicode_alloc(size_t * slen, const UChar * ucsS,
 	int32_t bfsz = 0;
 
 	assert(__APPLE__ == 1);
-	buf = (char *)ymalloc((size_t) BUFSIZ,"utf8FromUnicode_alloc","buf");
+	buf = (char *)ymalloc((size_t) BUFSIZ,procname,bufname);
 	/* Make buffer to store converted utf-16 line in    */
 
 	UErrorCode uic_ERR = U_ZERO_ERROR;
@@ -234,7 +236,7 @@ utf8FromUnicode_alloc(size_t * slen, const UChar * ucsS,
 		return NULL;
 	if (buf == NULL)
 		return NULL;
-	buf = (char *)yrealloc(buf, (size_t) (bfsz * sizeof(char)),"utf8FromUnicode_alloc","buf");
+	buf = (char *)yrealloc(buf, (size_t) (bfsz * sizeof(char)),procname,bufname);
 	/* shrink to fit */
 	if (buf == NULL)
 		return NULL;
@@ -351,9 +353,11 @@ mbstowcs_alloc2(wchar_t ** buf, const char *string, size_t slen)
 wchar_t *
 mbstowcs_alloc(const char *string)
 {
+    const char procname[]="mbstowcs_alloc" ;
+    const char bufname[]="buf" ;
 	size_t slen = strlen(string);
 
-	wchar_t *buf = ymalloc(((slen + 1) * sizeof(wchar_t)),"mbstowcs_alloc","buf") ;
+	wchar_t *buf = ymalloc(((slen + 1) * sizeof(wchar_t)),procname,bufname) ;
 	size_t wcs_len = mbstowcs(buf, string, slen);
 
 	if (wcs_len == (size_t) 0) {
@@ -361,7 +365,7 @@ mbstowcs_alloc(const char *string)
 		return NULL;
 	}
 	buf[wcs_len] = (wchar_t) '\0';
-	buf = yrealloc(buf, (wcs_len * sizeof(wchar_t)),"mbstowcs_alloc","buf");
+	buf = yrealloc(buf, (wcs_len * sizeof(wchar_t)),procname,bufname);
 	return buf;
 }
 
@@ -370,23 +374,24 @@ mbstowcs_alloc(const char *string)
 char *
 wcstombs_alloc(const wchar_t * wcsS)
 {
+    const char procname[]="wcstombs_alloc" ;
+    const char bufname[]="buf" ;
 	size_t wcs_len = wcslen(wcsS);
 
 	size_t bufsz = wcs_len * 4 + 1;
 
 	/* One can need four chars for one codepoint in wcs.    */
-	char *buf = (char *)ymalloc(bufsz * sizeof(char),"wcstombs_alloc","buf");
+	char *buf = (char *)ymalloc(bufsz * sizeof(char),procname,bufname);
 
 	assert(__APPLE__ == 1);
 	size_t slen = wcstombs(buf, wcsS, bufsz);
 
 	if (slen == (size_t) - 1) {
-		fprintf(stderr, "wcstombs_alloc: failure during conversion\n");
 		free(buf);
-		return NULL;
+        ysimpleError("Index: wcstombs_alloc: failure during conversion.",YX_EXTERNAL_CAUSE);
 	}
 	buf[slen] = '\0';
-	buf = (char *) yrealloc(buf, ((slen + 1) * sizeof(char)),"wcstobms_alloc","buf");
+	buf = (char *) yrealloc(buf, ((slen + 1) * sizeof(char)),procname,bufname);
 	return buf;
 }
 /* returns a unicode string converted from a wchar_t string.
@@ -398,7 +403,10 @@ wcstombs_alloc(const wchar_t * wcsS)
 UChar *
 unicodeFromWcs_alloc(size_t * uchlen, const wchar_t * wcsS)
 {
+    const char procname[]="unicodeFromWcs_alloc" ;
+    const char uchbufname[]="uchbuf" ;
 	char *buf = wcstombs_alloc(wcsS);
+    
 
 	if (buf == NULL)
 		return NULL;
@@ -408,7 +416,7 @@ unicodeFromWcs_alloc(size_t * uchlen, const wchar_t * wcsS)
 	/* Size of Apple's wide chars is 32 bit, it doesn't play well with ICU      */
 	/* so this code needs a rewrite. where your platform is added.              */
 	/* Please push your changes to the repository!                              */
-	UChar *uchbuf = (UChar *) ymalloc(((slen + 1) * sizeof(UChar)),"unicodeFromWcs_alloc","uchbuf");
+	UChar *uchbuf = (UChar *) ymalloc(((slen + 1) * sizeof(UChar)),procname,uchbufname);
     memset(uchbuf,(int) 0,(slen + 1 * sizeof(UChar)));
 	/* have to convert back to multibyte string before converting to unicode!
 	   uses the assumption that the mbs is utf8, and that locale has been set
@@ -421,12 +429,9 @@ unicodeFromWcs_alloc(size_t * uchlen, const wchar_t * wcsS)
 	(void)u_strFromUTF8(NULL, 0, &bfsz, buf, (int32_t) slen, &uic_ERR);
 	if (uic_ERR != U_BUFFER_OVERFLOW_ERROR) {
 	/* if we didn't get an overflow error during preflight, then its an error!  */
-		fprintf(stderr,
-			"unicodeFromWcs_alloc u_strFromUTF8 PREFLIGHT errcode = %d\n",
-			(int)uic_ERR);
 		free(buf);
 		free(uchbuf);
-		return NULL;
+        y_icuerror(YICU_CNVPREUTF8_ERR,procname,uchbuf, uic_ERR ); 
 	}
 
 	uic_ERR = U_ZERO_ERROR;
@@ -435,13 +440,12 @@ unicodeFromWcs_alloc(size_t * uchlen, const wchar_t * wcsS)
 			  (int32_t) slen, &uic_ERR);
 	/* We perform the conversion to unicode into a preallocated buffer.         */
 	if (uic_ERR != U_ZERO_ERROR) {
-		fprintf(stderr,
-			"unicodeFromWcs_alloc u_strFromUTF8 errcode = %d\n",
-			(int)uic_ERR);
-		return NULL;
+		free(buf);
+		free(uchbuf);
+        y_icuerror(YICU_CNVFUTF8_ERR,procname,uchbuf, uic_ERR ); 
 	}
 	free(buf);
-	uchbuf = (UChar *) yrealloc(uchbuf, ((bfsz + 1) * sizeof(UChar)),"unicodeFromWcs_alloc","uchbuf");
+	uchbuf = (UChar *) yrealloc(uchbuf, ((bfsz + 1) * sizeof(UChar)),procname,uchbufname);
 	uchbuf[bfsz] = (UChar) '\0';
 	*uchlen = bfsz;
 	return uchbuf;
@@ -528,6 +532,8 @@ UChar *
 unicodeFromUTF8_alloc(int32_t * ucsLen, const char *utf8S,
 			     const size_t utf8Len)
 {
+    const char procname[]="unicodeFromUTF8_alloc" ;
+    const char bufname[] ="buf" ;
 	UChar *buf;
 
 	int32_t uchCap = ((int32_t) utf8Len + 1) * sizeof(UChar);
@@ -535,7 +541,7 @@ unicodeFromUTF8_alloc(int32_t * ucsLen, const char *utf8S,
 	int32_t bfsz = 0;
 
 	assert(__APPLE__ == 1);
-	buf = (UChar *) ymalloc((size_t) uchCap,"unicodeFromUTF8_alloc","buf");
+	buf = (UChar *) ymalloc((size_t) uchCap,procname,bufname);
 	/* Make buffer to store converted utf-16 line in    */
 
 	UErrorCode uic_ERR = U_ZERO_ERROR;
@@ -553,7 +559,7 @@ unicodeFromUTF8_alloc(int32_t * ucsLen, const char *utf8S,
 	if (uic_ERR != U_ZERO_ERROR)
 		return NULL;
 
-	buf = (UChar *) yrealloc(buf, (size_t) (bfsz * sizeof(UChar)),"unicodeFromUTF8_alloc","buf");
+	buf = (UChar *) yrealloc(buf, (size_t) (bfsz * sizeof(UChar)),procname,bufname);
 
 	*ucsLen = bfsz;
 	return buf;

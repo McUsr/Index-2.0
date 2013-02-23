@@ -123,9 +123,7 @@ void select_db(void)
         files on the man page. */
         char *labelfn =  getFullLabelFileName() ; 
         if ( file_is_empty(labelfn) || (!labelFileOkAfterLinting(labelfn))) {
-            fprintf(stderr,"Index: User redecided creation of new database and thereby quitted.\n") ;
-            finish(0) ;
-            exit(0) ;
+            ysimpleError("Index: User defaulted creating a new database. We exit.!",YX_ALL_WELL) ;
         } 
         setLabelFileCreated() ;    
     }
@@ -145,24 +143,16 @@ void select_db(void)
 
 static int load_dblist(wchar_t * dblist[MAXDBFILES])
 {
+    const char procname[]="load_dblist" ;
 	DIR *dp;
-
 	int ndbs;
-
 	char *dbdir;
-
 	char tmpFn[MAXPATHLEN];
-
 	register char *s = NULL;
-
 	register UChar *ucs = NULL;
-
 	register struct direct *d;
-
 	size_t slen = 0;
-
 	int32_t ucsz = 0, reslen = 0;
-
 	UChar *uchList[MAXDBFILES];
 
 	/* TODO: needs some error messages, when just the index file is found and
@@ -173,9 +163,7 @@ static int load_dblist(wchar_t * dblist[MAXDBFILES])
 	/* Open db directory.                                   */
 	if ((dp = opendir(dbdir)) == NULL) {
 		/* This is happening  before we are calling curses  */
-		fprintf(stderr, "%s: cannot open \"%s\".\n", getProgramName(),
-			dbdir);
-		exit(1);
+        yerror(YDIR_OPEN_ERR,procname,dbdir,YX_EXTERNAL_CAUSE ) ;
 	}
 	while ((d = readdir(dp)) != NULL) {
 		/* Search for a "." in name, which marks suffix.    */
@@ -196,17 +184,15 @@ static int load_dblist(wchar_t * dblist[MAXDBFILES])
 				ucsz = (int32_t) slen * 4;
 
 				ucs =
-				    (UChar *) ymalloc(((size_t) ucsz * sizeof(UChar)),"load_dblist","ucs");
+				    (UChar *) ymalloc(((size_t) ucsz * sizeof(UChar)),procname,"ucs");
 
                 reslen = unicodeFromUTF8(ucs, ucsz, tmpFn, slen);
                 if (reslen >= 1) {
-                    ucs = yrealloc(ucs, (reslen * sizeof(UChar)),"load_dblist","ucs");
+                    ucs = yrealloc(ucs, (reslen * sizeof(UChar)),procname,"ucs");
                     uchList[ndbs++] = ucs;
                 } else {
-                    fprintf(stderr,
-							"%s: load_dblist: cannot convert item  \"%d\" to unicode.\n",
-                        getProgramName(), ndbs);
-                    exit(1);
+                    /*TODO: kan vi polle ICU ERROR code for dette? , -> invalid bytesequence? */
+                    ysimpleError("Index: load_dblist: cannot convert  a filename to unicode.",YX_EXTERNAL_CAUSE ) ;
                 }
 			}
 		}
@@ -221,9 +207,7 @@ static int load_dblist(wchar_t * dblist[MAXDBFILES])
 		qsort(uchList, (size_t) ndbs, sizeof(UChar *),
 		      (compFunc) compare_legacy);
 	} else {
-		fprintf(stderr, "%s : select_db: couldn't create a collator.\n",
-			getProgramName());
-		exit(1);
+        y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
 	}
 	ucol_close(compareCollator);
 
@@ -231,18 +215,13 @@ static int load_dblist(wchar_t * dblist[MAXDBFILES])
 
 		int32_t ul = u_strlen(uchList[i]);
 
-		int32_t uchCap = (ul * ((int32_t) sizeof(wchar_t) * 4)) + 1;
-
 		size_t buflen = 0 ;
 	    dblist[i] = wcsFromUnicode_alloc(&buflen, uchList[i], ul);
 		if (buflen >= 1) {
 			free(uchList[i]);
 			uchList[i] = NULL;
 		} else {
-			fprintf(stderr,
-				"%s: load_dblist: cannot convert item  \"%d\" to wcs.\n",
-				getProgramName(), i);
-			exit(1);
+            ysimpleError("Index: load_dblist: cannot convert  a filename to wcs.",YX_EXTERNAL_CAUSE ) ;
 		}
 	}
 	dblist[ndbs] = NULL;

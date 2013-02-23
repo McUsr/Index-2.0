@@ -138,6 +138,7 @@ csv_value( const char *field_value, int FIELD_DELIM )
 int
 print_db(void)
 {
+    const char procname[]="print_db" ;
 	FILE *pp;
 
 	char * buf;
@@ -181,7 +182,7 @@ print_db(void)
 						    strlen(tmpbuf);
 
 						char *nsqlified =
-						    (char *)ymalloc((tmpbuflen + 2),"print_db","nsqlified");
+						    (char *)ymalloc((tmpbuflen + 2),procname,"nsqlified");
                         char *t = nsqlified ;
                         *t++ = (char) 0x01 ;
                         strcat(t,tmpbuf ) ;
@@ -335,13 +336,7 @@ print_db(void)
 	 * Open the pipe.
 	 */
 	if ((pp = popen(buf, "w")) == NULL) {
-		char emi[BUFSIZ];
-
-		sprintf(emi, "%s: cannot execute \"%s\":", getProgramName(),
-			buf);
-		reset_modes(); /* WTF */
-		perror(emi);
-		exit(1);
+        yerror(YPIP_EXEC_ERR,procname,buf,YX_EXTERNAL_CAUSE ) ;
 	}
 	/* det kan hende vi vil ha på headers sendere uten filter
 	   da havner dette over.
@@ -355,7 +350,7 @@ print_db(void)
     
     			size_t tmpbuflen = strlen(tmpbuf);
     
-    			char *nsqlified = (char *)ymalloc((tmpbuflen + 2),"print_db","nsqlified");
+    			char *nsqlified = (char *)ymalloc((tmpbuflen + 2),procname,"nsqlified");
                 char *t = nsqlified ;
                 *t++ = (char) 0x01 ;
                 strcat(t,tmpbuf ) ;
