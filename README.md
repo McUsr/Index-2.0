@@ -29,7 +29,7 @@ At the same time it is reasonably easy to filter the information. You can
 have filters working on the database to filter on the criteria you'll
 like. There are a great many commandline options to help you "massage"
 your data, and you can also export your data as csv. See the man page
-(man1/index.1 for all the options). or [Index html man page) (https://dl.dropbox.com/u/6829111/index.html "Index.1")
+(man1/index.1 for all the options). or [Index html man page] (https://dl.dropbox.com/u/6829111/index.html "Index.1")
 
 The progress:
 -------------
