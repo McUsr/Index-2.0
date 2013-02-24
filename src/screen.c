@@ -97,7 +97,7 @@ ConvertCh(chtype source, cchar_t * target)
 
 	tmp_wchar[0] = source;
 	tmp_wchar[1] = 0;
-	if (setcchar(target, tmp_wchar, A_NORMAL, 0, (void *)0) == ERR) {
+	if (setcchar(target, tmp_wchar, A_NORMAL, 0, NULL) == ERR) {
 		beep();
 		return FALSE;
 	}
@@ -303,14 +303,11 @@ prompt_str(int row, int col, const char *promptstr, wchar_t * answer)
 wchar_t
 prompt_char(int row, int col, const char *promptstr, const char *valid)
 {
-	wchar_t *w_prompt, *w_valid, ch;
-
+	wchar_t *w_prompt, *w_valid=NULL, ch;
+   
 	int code;
 
 	w_prompt = mbstowcs_alloc(promptstr);
-    if (valid != NULL ) {
-	    w_valid = mbstowcs_alloc(valid);
-    }
 
 	/* if w_promptstr == NULL ?? .... */
 
@@ -319,6 +316,9 @@ prompt_char(int row, int col, const char *promptstr, const char *valid)
 	clrtoeol();
 	refresh();
 
+    if ( valid  != NULL ) {
+            w_valid  = mbstowcs_alloc(valid);
+    }
 	/* Read characters...                                       */
 	while ((code = get_wch(&ch)) != ERR) {
 		/* If it's not a valid one, beep and get another one.   */
@@ -336,40 +336,16 @@ prompt_char(int row, int col, const char *promptstr, const char *valid)
 		goto _exit;
 	}
  _exit:
-	refresh();
 	free(w_prompt);
+	refresh();
     if (valid != NULL ) {
 	    free(w_valid);
+        w_valid= NULL ;
         return (ch);		/* to avoid compiler warning */
     } else {
         return '\0' ;
    }
-
 }
-
-/* allow the user to edit a database entry.                     */
-/* it has gotten a brand new empty struct when from add_entry   */
-/* will be refactored to deal with just essential stuff.        */
-
-/*
- * Dette er avhengig av indeks fil, så jeg kan ikke ferdigstille
- * dette før jeg er ferdig med å lese inn records.
- *
- * Men, selve editing, kan gjøres som i prompt_str.
- * Med bugfix for delete i siste posisjon, og med de andre till
- * eggene,
- *
- * kanskje er det lurt å vente med å gjøre noe på dette før
- * vi finner ut av avbruddshåndtering i prompt_str.
- *
- * men før vi implementer avbrudsshåndtering.
- *
- * Da er det best å se på hvordan dette skal fungere
- *
- * begge steder.
- * Det er problemer her som må løses.
- * 
-*/
 
 /*
    returns the widechar path of the label file directory of the datebase
@@ -381,7 +357,7 @@ prompt_char(int row, int col, const char *promptstr, const char *valid)
    execute index from there. -great for editing and testing filter files!
 
 */
-#define BUFSIZ 80
+#define MAXSCREENWIDTH 254
 static wchar_t *
 wcs_dbdir( void ) 
 {
@@ -412,7 +388,7 @@ wcs_dbfullname(void)
 void
 initEntryLine(void ) {
 
-	char tbuf[BUFSIZ];
+	char tbuf[MAXSCREENWIDTH];
     
 	sprintf(tbuf, " (%d entries)", dbentries);
     if (entriesLine != NULL ) {
@@ -430,7 +406,7 @@ initEntryLine(void ) {
 void
 initHeading(void)
 {
-	char tbuf[BUFSIZ];
+	char tbuf[MAXSCREENWIDTH];
     if (wprgname == NULL ) {
         wprgname = mbstowcs_alloc(getProgramName() ) ;
     }
@@ -488,24 +464,23 @@ paintHeading(const char *modeword)
 
  */
 int
-edit_entry(dbrecord * entry, const char *word)
+edit_entry(dbrecord * entry, const char *operationDesc, const char *entryDesc)
 {
 	int *len;
 	int col0;
 	wchar_t *line=NULL;
-	char tbuf[BUFSIZ];
+	char tbuf[MAXSCREENWIDTH];
 	int code = 0;
 	wchar_t ch;
 	dbbuffer tmp;
 	register int i, j, row, col;
-	int maxCols = COLS;
     initHeading() ;
 	/* Where is "column zero"? To right of longest field name.  */
 	col0 = idx.idx_maxlen + 2;
 
 	 clear();		/* Clear the screen.                            */
     initEntryLine() ;
-    paintHeading(word) ;
+    paintHeading(operationDesc) ;
 	/* get max col TODO: change this when sigwhinch */
     /* first time: allocat wchar fulldbdir name
        fulldbdir is a static.*/
@@ -521,7 +496,7 @@ edit_entry(dbrecord * entry, const char *word)
         int k = i-STARTROW ;
 		if (entry->db_lens[k] == 0) {
 			/* Allocate memory for this line.                   */
-            size_t linelen = (BUFSIZ * sizeof(wchar_t));
+            size_t linelen = (MAXSCREENWIDTH * sizeof(wchar_t));
 			tmp.db_lines[k] =
                  (wchar_t *) ymalloc(linelen,
                     "edit_entry","tmp.db_lines[k]" );
@@ -539,7 +514,7 @@ edit_entry(dbrecord * entry, const char *word)
 			/* reallocates more space to maximum linebuffer size. */
 			tmp.db_lines[k] =
 			    (wchar_t *) yrealloc(tmp.db_lines[k], (size_t)
-						(BUFSIZ * sizeof(wchar_t)),"edit_entry","tmp.db_lines[k]");
+						(MAXSCREENWIDTH * sizeof(wchar_t)),"edit_entry","tmp.db_lines[k]");
 		}
 
 		move(i, col0);
@@ -658,7 +633,7 @@ edit_entry(dbrecord * entry, const char *word)
 		case CTRL('['):	/* save entry:  ESC or something...  */
 			if (line[*len] != (wchar_t) '\0')
 				line[*len] = (wchar_t) '\0';
-			sprintf(tbuf, "Save %s entry in database (y/n)? ", word);
+			sprintf(tbuf, "Save %s entry in database (y/n)? ", entryDesc);
 			ch = prompt_char(idx.idx_nlines + 2+ STARTROW, 0, tbuf, "yYnN");
 
 			/* See what they said.                              */
@@ -762,6 +737,7 @@ edit_entry(dbrecord * entry, const char *word)
 int
 byebye(void)
 {
+    static const char exitPrompt[]="Really exit without saving? (y/n) ";
 	register char c;
 
 	register int x, y;
@@ -770,8 +746,7 @@ byebye(void)
 	/* quit without saving.                                 */
 	if (dbmodified) {
 		getyx(curscr, y, x);
-		c = prompt_char(y, 0, "Really exit without saving? (y/n) ", "YyNn");
-
+		c = prompt_char(y, 0,exitPrompt , "YyNn");
 		if ((c == 'n') || (c == 'N'))
 			return 0;
 		else

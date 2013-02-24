@@ -48,7 +48,12 @@ int main(void)
 	return 0;
 }
 #endif
-/*allow user to select from list of dbs's or create new     */
+/*
+    Returns: nothing.
+    Allow user to select a database from list of dbs's found in either $INDEXDIR or
+    $HOME/.index or create a new, that will be placed in the directory we are currently
+    using for databases.
+*/
 void select_db(void)
 {
     wchar_t dbasename[MAXPATHLEN] = { L"" };
@@ -134,16 +139,17 @@ void select_db(void)
 	}
 }
 
-/* load up a list of user's databases                       */
-/* Antar at det er ok å lese inn filnavn først som en
- * streng  av chars.
- * Men jeg må konverertere denne til utf16?
- *
- *Both files are UTF-16 with little-endian byte mark        */
+/*
+    Returns: The number of databases that we found in either 
+    $INDEXDIR or $HOME/.index. This list is passed back to select_db
+    through dblist.
+*/
+
 
 static int load_dblist(wchar_t * dblist[MAXDBFILES])
 {
-    const char procname[]="load_dblist" ;
+    static const char procname[]="load_dblist" ;
+    static const char ucsname[]="ucs" ;
 	DIR *dp;
 	int ndbs;
 	char *dbdir;
@@ -184,14 +190,13 @@ static int load_dblist(wchar_t * dblist[MAXDBFILES])
 				ucsz = (int32_t) slen * 4;
 
 				ucs =
-				    (UChar *) ymalloc(((size_t) ucsz * sizeof(UChar)),procname,"ucs");
+				    (UChar *) ymalloc(((size_t) ucsz * sizeof(UChar)),procname,ucsname);
 
                 reslen = unicodeFromUTF8(ucs, ucsz, tmpFn, slen);
                 if (reslen >= 1) {
-                    ucs = yrealloc(ucs, (reslen * sizeof(UChar)),procname,"ucs");
+                    ucs = yrealloc(ucs, (reslen * sizeof(UChar)),procname,ucsname);
                     uchList[ndbs++] = ucs;
                 } else {
-                    /*TODO: kan vi polle ICU ERROR code for dette? , -> invalid bytesequence? */
                     ysimpleError("Index: load_dblist: cannot convert  a filename to unicode.",YX_EXTERNAL_CAUSE ) ;
                 }
 			}

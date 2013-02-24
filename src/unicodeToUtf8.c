@@ -353,16 +353,16 @@ mbstowcs_alloc2(wchar_t ** buf, const char *string, size_t slen)
 wchar_t *
 mbstowcs_alloc(const char *string)
 {
-    const char procname[]="mbstowcs_alloc" ;
-    const char bufname[]="buf" ;
+    static const char procname[]="mbstowcs_alloc" ;
+    static const char bufname[]="buf" ;
 	size_t slen = strlen(string);
 
 	wchar_t *buf = ymalloc(((slen + 1) * sizeof(wchar_t)),procname,bufname) ;
 	size_t wcs_len = mbstowcs(buf, string, slen);
 
-	if (wcs_len == (size_t) 0) {
+	if (wcs_len == (size_t) -1) {
 		free(buf);
-		return NULL;
+        ysimpleError("Index: mbstowcs_alloc: failure during conversion.",YX_EXTERNAL_CAUSE);
 	}
 	buf[wcs_len] = (wchar_t) '\0';
 	buf = yrealloc(buf, (wcs_len * sizeof(wchar_t)),procname,bufname);
@@ -374,8 +374,8 @@ mbstowcs_alloc(const char *string)
 char *
 wcstombs_alloc(const wchar_t * wcsS)
 {
-    const char procname[]="wcstombs_alloc" ;
-    const char bufname[]="buf" ;
+    static const char procname[]="wcstombs_alloc" ;
+    static const char bufname[]="buf" ;
 	size_t wcs_len = wcslen(wcsS);
 
 	size_t bufsz = wcs_len * 4 + 1;
@@ -431,7 +431,7 @@ unicodeFromWcs_alloc(size_t * uchlen, const wchar_t * wcsS)
 	/* if we didn't get an overflow error during preflight, then its an error!  */
 		free(buf);
 		free(uchbuf);
-        y_icuerror(YICU_CNVPREUTF8_ERR,procname,uchbuf, uic_ERR ); 
+        y_icuerror(YICU_CNVPREUTF8_ERR,procname,uchbufname, uic_ERR ); 
 	}
 
 	uic_ERR = U_ZERO_ERROR;
@@ -442,7 +442,7 @@ unicodeFromWcs_alloc(size_t * uchlen, const wchar_t * wcsS)
 	if (uic_ERR != U_ZERO_ERROR) {
 		free(buf);
 		free(uchbuf);
-        y_icuerror(YICU_CNVFUTF8_ERR,procname,uchbuf, uic_ERR ); 
+        y_icuerror(YICU_CNVFUTF8_ERR,procname,uchbufname, uic_ERR ); 
 	}
 	free(buf);
 	uchbuf = (UChar *) yrealloc(uchbuf, ((bfsz + 1) * sizeof(UChar)),procname,uchbufname);

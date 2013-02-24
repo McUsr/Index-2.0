@@ -242,7 +242,7 @@ void disp_entries(void)
 			goto top;
 		case 'e':	/* edit entry           */
 			/* Let them edit the entry.                     */
-			if (edit_entry(&db[i], " EDIT modified"))
+			if (edit_entry(&db[i], " EDIT modified","this"))
 				dbmodified = 1;
 
 			save = i;
@@ -291,7 +291,10 @@ void disp_entries(void)
 /* add an entry to database.                                */
 void add_entry(void)
 {
-    const char procname[]="add_entry" ;
+    static const char procname[]="add_entry" ;
+    static const char collatorname[]="compareCollator" ;
+    static const char operationDesc[]=" EDIT New Entry";
+    static const char recordDesc[]="new" ;
 	register int i;
 	/* Search for an empty entry in array.                  */
 	for (i = 0; i < dbsize; i++) {
@@ -300,7 +303,7 @@ void add_entry(void)
 			/* Clear out any old junk.                       */
             memset(&db[i],(int) 0,sizeof(dbrecord)) ;
 			/* Let user edit the entry.                     */
-			if (edit_entry(&db[i], " EDIT New Entry")) {
+			if (edit_entry(&db[i],operationDesc,recordDesc)) {
 				/* Mark it valid, mark db as modified,      */
 				db[i].db_flag |= DB_VALID;
 				dbmodified = 1;
@@ -317,7 +320,7 @@ void add_entry(void)
 					      sizeof(dbrecord),
 					      (compFunc) dbsort);
 				    } else {
-                        y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
+                        y_icuerror( YICU_CRECOLL_ERR, procname, collatorname, status ) ;
 				    }
 				    ucol_close(compareCollator);
                 }
@@ -334,7 +337,7 @@ void add_entry(void)
 	}
     memset(&db[dbentries],(int) 0, sizeof(dbrecord)); 
 	/* Let user edit new entry.                              */
-	if (edit_entry(&db[dbentries], "new")) {
+	if (edit_entry(&db[dbentries],operationDesc,recordDesc)) {
 		/* Mark entry as valid, mark db as modified,        */
 		/* increase number of entries.                      */
 		db[dbentries].db_flag |= DB_VALID;
@@ -348,7 +351,7 @@ void add_entry(void)
 			qsort(db, (size_t) dbentries, sizeof(dbrecord),
 			      (compFunc) dbsort);
 		} else {
-            y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
+            y_icuerror( YICU_CRECOLL_ERR, procname,collatorname, status ) ;
 		}
 		ucol_close(compareCollator);
 	}
@@ -358,6 +361,7 @@ void add_entry(void)
 int
 del_entry(void)
 {
+    static const char deleteConfirmation[]="Really delete this entry? (y/n)";
 	char c;
 
 	int x, y;
@@ -365,7 +369,7 @@ del_entry(void)
 
 	/* Prompt user for confirmation.                        */
 	getyx(curscr, y, x);
-	c = prompt_char(y, 0, "Really delete this entry? (y/n)", "YyNn");
+	c = prompt_char(y, 0,deleteConfirmation, "YyNn");
 
 	/* Return status of confirmation.                       */
 	switch (c) {

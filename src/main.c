@@ -90,7 +90,6 @@ main(int argc, char **argv)
 		{NULL, 0, NULL, 0},
 	};
     int option_index = 0 ;
-    /* TODO: fill in with arguments ERROR HANDLING MISSING!!! */
 	while ((ch = getopt_long(argc, argv, "f:ibsHvRnF:cqhuCV", longopts, &option_index)) != -1)
 		switch (ch) {
 		case 'f':
@@ -127,7 +126,7 @@ main(int argc, char **argv)
             set_csv() ;
             break;
 		case 'q':
-			set_quiet(); /*TODO : */
+			set_quiet();
 			break;
 		case 'h':
             help() ;
@@ -138,11 +137,10 @@ main(int argc, char **argv)
         case 'V':
             print_version() ;
             break;
-		 /*TODO*/ case 'C':
+		case 'C':
 			print_copyright();
 			break;
 		default:
-			/*TODO : error message */
 			usage();
 			break;
 		}
@@ -167,6 +165,21 @@ main(int argc, char **argv)
         if (wants_reverse ) {
             set_reverse() ;
         }
+     }
+     if ( hasPattern() && no_dbase_name() ) {
+         ysimpleError("Index: I need a databasename when a pattern is specified.",YX_ALL_WELL ) ; 
+         usage() ;
+     }
+     
+     if ( has_dbfilter() && no_dbase_name() ) {
+         ysimpleError("Index: I need a databasename when a filter is specified.",YX_ALL_WELL ) ; 
+         usage() ;
+     }
+
+     if ( has_dbfilter() && (!hasPattern())) {
+         ysimpleError("Index: I need a regexp even just \".*\" when a filter is specified.",YX_ALL_WELL ) ; 
+         usage() ;
+
      }
 
 	(void)signal(SIGINT, finish);
@@ -378,7 +391,7 @@ static void
 usage(void)
 {
 	fprintf(stderr,"index -f [filter] -i -V -s -H -v -R -n -F [field separator] -q -h -u -C -V <file> <pattern>\n") ;
-    fprintf(stderr,"index uses UTF-8 text encoding, and your Country's collation order for sorting.\n") ;
+    fprintf(stderr,"index 2.0 uses UTF-8 text encoding, and your country's collation order for sorting.\n") ;
     fprintf(stderr," See \"man index\" for further help.\n");
 	exit(0);
 }

@@ -314,7 +314,7 @@ print_db(void)
         } 
 	   return (hasoutput == 1 ) ? 0 : 1 ;
 	}
-
+    fprintf(stderr,"has dbfilter in print_db\n") ;
 	/*
 	 * Otherwise, we set up a pipe to the dbFilter, and print
 	 * first the field names, and then the fields.  We do

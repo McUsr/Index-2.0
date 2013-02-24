@@ -20,6 +20,7 @@
 #include <unicodeToUtf8.h>
 #include <initcurses.h>
 #include <defs.h>
+#include <screen.h> 
 #include <util.h>
 
 static int hasError=0;
@@ -250,7 +251,7 @@ yerror( int strIndex, const char *handler, const char *variable, int ourErrCode 
             register int y,x ;
 		    getyx(curscr, y, x);
 	        mvaddstr(y++, 5, errL1);
-            if (errL=2) {
+            if (errL==2) {
 	            mvaddstr(y++, 5, errL2);
             }
            prompt_char(y,5,"Hit any key to exit Index",NULL) ; 
@@ -272,6 +273,9 @@ void
 ysimpleError( const char *errmsg, int ourErrCode )
 {
    fprintf(stderr,"%s\n",errmsg) ;
-   finish(ourErrCode) ; 
+   finish(0) ; 
+    if (ourErrCode) {
+        exit(ourErrCode ) ;
+    }
 }
 
