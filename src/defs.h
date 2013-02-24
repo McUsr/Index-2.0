@@ -68,7 +68,6 @@
 #define YFORK_PROC_ERR 18
 #define YICU_CNVFUTF8_ERR 19
 #define YICU_CNVPREUTF8_ERR 20 
-/* constants for painting the screen correctly */
 
 #define STARTROW 4
 

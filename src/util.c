@@ -141,7 +141,6 @@ char
 *savestr(const char *str, const char *handler, const char *variable)
 {
 	char *s;
-    
 	s = (char *)ymalloc((strlen(str) + 1),handler,variable); 
 
 	strcpy(s, str);
@@ -224,25 +223,45 @@ y_icuSimpleError( const char *errmsg,  UErrorCode errcode )
     we'll have to adhere to no matter how we are going to implement the system.
 
 */
+/*
+TODO:
+    take the ICU-ERROR CODES INTO ACCOUNT, AND NOT PRINT THE str_error message then
+    OR: fork out a separate hander for this. or use the y_icu_simpleerror.
+    --> this is cleaner.
+*/
+
 void
 yerror( int strIndex, const char *handler, const char *variable, int ourErrCode )
 {
-	char errl1[BUFSIZ];
-	char errl2[BUFSIZ];
+	char errL1[BUFSIZ];
+	char errL2[BUFSIZ];
+    int errL = 2 ;
     if (!hasError) {
         hasError = 1 ;
-	    sprintf(errl1,(const char *)errstrings[strIndex] ,pname,handler, variable) ; 
-	    sprintf(errl2,"%s: error number : %d, message: %s.",pname,errno,strerror(errno) ) ;
+	    sprintf(errL1,(const char *)errstrings[strIndex] ,pname,handler, variable) ; 
+        if ((strIndex != YICU_CONV_ERR ) && (strIndex != YICU_COLLATO_ERR ) 
+                && (strIndex != YICU_CRECOLL_ERR ) && (strIndex != YICU_CNVFUTF8_ERR )
+                && (strIndex != YICU_CNVPREUTF8_ERR ) ) {
+	        sprintf(errL2,"%s: error number : %d, message: %s.",pname,errno,strerror(errno) ) ;
+            errL = 1 ;
+        }
         /* here is the place we call stuff if curses is inited */
         if (curses_active() ) {
-            ;
+            register int y,x ;
+		    getyx(curscr, y, x);
+	        mvaddstr(y++, 5, errL1);
+            if (errL=2) {
+	            mvaddstr(y++, 5, errL2);
+            }
+           prompt_char(y,5,"Hit any key to exit Index",NULL) ; 
             /* we take down curses here */
         }         
-        fprintf(stderr,"%s\n",errl1) ;
-        fprintf(stderr,"%s\n",errl2) ;
-
-        finish(ourErrCode) ; 
-
+        finish(0) ; 
+        fprintf(stderr,"%s\n",errL1) ;
+        if ( errL == 2 ) {
+            fprintf(stderr,"%s\n",errL2) ;
+        }
+        exit(ourErrCode ) ;
    }
 }
 /* for very simple error messages: behaves like yerror, but there is no error

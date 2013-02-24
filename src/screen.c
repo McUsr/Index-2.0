@@ -90,7 +90,8 @@ int main(void)
     return temp_buffer;
 
 /* stolen from Thomas Dickey's test_addwchar.c ncurses test-suite.  */
-static int ConvertCh(chtype source, cchar_t * target)
+static int
+ConvertCh(chtype source, cchar_t * target)
 {
 	wchar_t tmp_wchar[2];
 
@@ -104,7 +105,8 @@ static int ConvertCh(chtype source, cchar_t * target)
 }
 
 /* stolen from Thomas Dickey's test_addwchar.c ncurses test-suite.  */
-static int AddCh(chtype ch)
+static int
+AddCh(chtype ch)
 {
 	int code;
 
@@ -118,7 +120,8 @@ static int AddCh(chtype ch)
 	return code;
 }
 
-static int InsWch(chtype ch)
+static int
+InsWch(chtype ch)
 {
 	int code;
 
@@ -140,7 +143,8 @@ static int InsWch(chtype ch)
  *          justert mot venstre selv om jeg ikke sletter noe.
  *
  * */
-void prompt_str(int row, int col, const char *promptstr, wchar_t * answer)
+void
+prompt_str(int row, int col, const char *promptstr, wchar_t * answer)
 {
 	wchar_t *line = answer;
 
@@ -296,14 +300,17 @@ void prompt_str(int row, int col, const char *promptstr, wchar_t * answer)
 
 /* prompt the user for a single character, which must be  in    */
 /* "valid" string.                                              */
-wchar_t prompt_char(int row, int col, const char *promptstr, const char *valid)
+wchar_t
+prompt_char(int row, int col, const char *promptstr, const char *valid)
 {
 	wchar_t *w_prompt, *w_valid, ch;
 
 	int code;
 
 	w_prompt = mbstowcs_alloc(promptstr);
-	w_valid = mbstowcs_alloc(valid);
+    if (valid != NULL ) {
+	    w_valid = mbstowcs_alloc(valid);
+    }
 
 	/* if w_promptstr == NULL ?? .... */
 
@@ -316,21 +323,28 @@ wchar_t prompt_char(int row, int col, const char *promptstr, const char *valid)
 	while ((code = get_wch(&ch)) != ERR) {
 		/* If it's not a valid one, beep and get another one.   */
 		/* if (index(valid, c) == NULL) { */
-		if (wcsrchr(w_valid, ch) == NULL) {	/* CHANGED !! */
-			beep();
-			continue;
-		}
+        if ( valid  != NULL ) {
+		    if (wcsrchr(w_valid, ch) == NULL) {	/* CHANGED !! */
+			    beep();
+			    continue;
+		    }
 
-		/* Add the character to the screen, and return it.      */
-		AddCh((chtype) ch);
-		refresh();
+		    /* Add the character to the screen, and return it.      */
+		    AddCh((chtype) ch);
+		    refresh();
+        }
 		goto _exit;
 	}
  _exit:
 	refresh();
 	free(w_prompt);
-	free(w_valid);
-	return (ch);		/* to avoid compiler warning */
+    if (valid != NULL ) {
+	    free(w_valid);
+        return (ch);		/* to avoid compiler warning */
+    } else {
+        return '\0' ;
+   }
+
 }
 
 /* allow the user to edit a database entry.                     */
@@ -356,9 +370,20 @@ wchar_t prompt_char(int row, int col, const char *promptstr, const char *valid)
  * Det er problemer her som må løses.
  * 
 */
-/* returns the widechar path of the label file directory */
+
+/*
+   returns the widechar path of the label file directory of the datebase
+   that is active of one set by the INDEXDIR variable, or $HOME/.index
+   (~/.index) really, since the directory of a database file specified
+   with a path from the command line really doesn't count when it comes
+   to finding label, or filter files.  One way to circumvent this is
+   to set INDEXDIR "." move to the directory where the file exists, and
+   execute index from there. -great for editing and testing filter files!
+
+*/
 #define BUFSIZ 80
-static wchar_t *wcs_dbdir( void ) 
+static wchar_t *
+wcs_dbdir( void ) 
 {
     if (db_dir == NULL ) { 
         db_dir = mbstowcs_alloc( get_dbase_dir() ) ;
@@ -366,14 +391,26 @@ static wchar_t *wcs_dbdir( void )
      return db_dir ;
 }
 
-static wchar_t *wcs_dbfullname(void) 
+/*
+    returns the widechar *fullname of the database in use, that is
+    the filename with a full directory spec in front of it, with the
+    adjoining .db suffix.
+*/
+static wchar_t *
+wcs_dbfullname(void) 
 {
     if (db_fullname == NULL ) {
         db_fullname = mbstowcs_alloc(getFullDbName() ) ;
     }
     return db_fullname ;
 }
-void initEntryLine(void ) {
+/*
+    Updates the line specifying the number of entries in the database,
+    when called from: main_menu, and read_database, edit_entry, add_entry,
+    delete_entry, find_entry.
+*/
+void
+initEntryLine(void ) {
 
 	char tbuf[BUFSIZ];
     
@@ -383,7 +420,15 @@ void initEntryLine(void ) {
     }
 	entriesLine = mbstowcs_alloc(tbuf);
 }
-void initHeading(void)
+/*
+    initiates the heading that is to be printed, save the entries line
+    This handler, along with paintheading is called upon from: main_menu,
+    and read_database, edit_entry, add_entry, delete_entry, find_entry.
+
+*/
+
+void
+initHeading(void)
 {
 	char tbuf[BUFSIZ];
     if (wprgname == NULL ) {
@@ -399,7 +444,15 @@ void initHeading(void)
     db_fullname = wcs_dbfullname() ;
 
 }
-void paintHeading(const char *modeword) 
+
+/*
+  paints the heading on the different "screens" with useful data
+  is called upon from: main_menu, and read_database, edit_entry,
+  add_entry, delete_entry, find_entry.
+
+*/
+void
+paintHeading(const char *modeword) 
 { 
     wchar_t *dbmodistr = NULL ;
     move(0,0) ;
@@ -426,6 +479,14 @@ void paintHeading(const char *modeword)
  * TODO: a.) Deklarere en db datatype basert på wide-characters.
  *       b.) kopiere inn og ut av datastrukturene.
  * */
+ /*
+    Returns whether we should save our changes or not.
+
+    Edits an existing an entry. This routine is far to big, and handles
+    everything, from movement between fields, and editing fields, even
+    painting the screen.
+
+ */
 int
 edit_entry(dbrecord * entry, const char *word)
 {

@@ -11,21 +11,31 @@
 #include <common.h>
 #include <initcurses.h>
 
-static int screen_inited = 0;	/* for use with set/reset modes */
+/* constants for writing to error-messages to  the screen correctly */
+#define SCR_INACTIVE 0x0
+#define SCR_INITED 0x01 
+#define SCR_DRAWING 0x02
+#define SCR_HEADING_PAINTED 0x04
+#define SCR_PENDING 0x08 
+static int screen_status = 0;	/* for use with set/reset modes */
 
 int
 curses_active(void) 
 {
-    return screen_inited ;
+    if ( screen_status & SCR_INITED ) {
+        return 1 ;
+    } else {
+        return 0 ;
+    }
 }
 /* restore tty modes to their original state.                   */
 void reset_modes(void)
 {
 	/* No need.                                                 */
-	if (!screen_inited)
+	if (screen_status == 0 )
 		return;
 
-	screen_inited = 0;
+	screen_status = 0;
 
 	/* Move to bottom of screen.                                */
 	move(LINES - 1, 0);
@@ -51,10 +61,10 @@ void reset_modes(void)
 void set_modes(void)
 {
 	/* Already done.                                            */
-	if (screen_inited)
+	if (screen_status)
 		return;
 
-	screen_inited = 1;
+	screen_status |= SCR_INITED;
 
 	/* Ignore signals. signalhandling moved into main.          */
 	signal(SIGQUIT, SIG_IGN);
