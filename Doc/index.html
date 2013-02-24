@@ -1,0 +1,764 @@
+<!-- Creator     : groff version 1.22.1 -->
+<!-- CreationDate: Sun Feb 24 18:04:21 2013 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>INDEX</title>
+
+</head>
+<body>
+
+<h1 align="center">INDEX</h1>
+
+<a href="#NAME">NAME</a><br>
+<a href="#SYNOPSIS">SYNOPSIS</a><br>
+<a href="#DESCRIPTION">DESCRIPTION</a><br>
+<a href="#CREATING A NEW DATABASE">CREATING A NEW DATABASE</a><br>
+<a href="#THE MAIN MENU">THE MAIN MENU</a><br>
+<a href="#SEARCHING FROM THE COMMAND LINE">SEARCHING FROM THE COMMAND LINE</a><br>
+<a href="#FILTERS">FILTERS</a><br>
+<a href="#EXAMPLE">EXAMPLE</a><br>
+<a href="#LIMITATIONS">LIMITATIONS</a><br>
+<a href="#SEE ALSO">SEE ALSO</a><br>
+<a href="#ORIGINAL AUTHOR">ORIGINAL AUTHOR</a><br>
+<a href="#AUTHOR VERSION 2.0">AUTHOR VERSION 2.0</a><br>
+
+<hr>
+
+
+<h2>NAME
+<a name="NAME"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>index</i>
+&minus; maintain simple text databases encoded in UTF-8.</p>
+
+<h2>SYNOPSIS
+<a name="SYNOPSIS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">index [
+<b>OPTION</b> ]... [ <b>DATABASE</b> ] [ <b>PATTERN</b>
+]</p>
+
+<p style="margin-left:11%; margin-top: 1em"><i>index</i> is
+probably the fastest way ever to input records of data from
+the keyboard. And to create a database file too. It&rsquo;s
+output seamlessly integrates with any
+<b><small>unix</small></b> filters you want to sift data
+through, or format the output with; -it can deliver output
+in CSV (comma separated values), for import into spread
+sheets or databases.</p>
+
+<h2>DESCRIPTION
+<a name="DESCRIPTION"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>Index</i> is
+used to maintain simple databases such as address lists,
+lists of books or compact discs, bugs, features,
+todo&rsquo;s, glossaries, terms, receipes, grades, expenses,
+objects, attributes, relations, and so on. All databases are
+stored as simple UTF-8 text files, the records will be
+sorted according to your national settings
+<b><small>$LC_ALL</small></b> and <b><small>$LC_COLL</small>
+. (See <small>man locale</small> ).</b> Any accented
+characters you use should of course work as exepected.
+<i>Index</i> lets you input database records by providing
+<b><small>EMACS</small> alike keyboard short cuts</b> for
+moving between fields and editing in general.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Your database
+files are stored in a single directory by default, if you
+don&rsquo;t specify a path on the commandline. The standard
+directory which the files are stored in, resides in your
+home <b><small>($HOME)</small></b> directory, and is called
+<b><small>.index ($HOME/.index)</small> .</b> You can
+specify a different path name for the directory by setting
+the environment variable <b><small>$INDEXDIR</small></b> to
+the directory&rsquo;s full path name. When you specify a
+path for the file from the commandline, it can be either an
+absolute path to the file, or a relative path to the file,
+relative to your current working directory
+<b><small>($PWD</small> ).</b></p>
+
+<p style="margin-left:11%; margin-top: 1em">If you do
+specify a path for the database file, then any filter files
+will also be looked for in the same directory. The label
+files which contains the labels for your database files,
+with corresponding names will still be looked for in the
+directory for which <b><small>$INDEXDIR</small></b> is set
+or in the directory <b><small>$HOME/.index</small> .</b>
+This gives you some advantages, if you for some reason want
+to just work with a subset of a database from a folder.</p>
+
+<p style="margin-left:11%; margin-top: 1em">When invoked
+with no arguments, <i>index</i> will present you with a list
+of the databases you have stored in either
+<b><small>$INDEXDIR</small></b> or
+<b><small>$HOME/.index</small></b> (You can not select any
+files you may have placed in other places interactively.)
+<i>index</i> will then ask you to select which file/database
+you want to work with. To create a new database, simply type
+the name of a non-existent database the prompt, or specify
+an non-existing one at the command-line. Conversely, thhe
+name of an existing database may also be specified on the
+command line, bypassing this step and going directly to the
+main menu. If you are in the process of getting output from
+<i>index</i> then you <i>must</i> specify the file on the
+commandline, together with a pattern and maybe a filter
+together with other output-options. <b><small><br>
+OPTIONS</small></b></p>
+
+<p style="margin-left:11%; margin-top: 1em"><b>-f</b>,
+<b>--filter</b>: <small>filtername</small></p>
+
+<p style="margin-left:22%; margin-top: 1em">Specify a
+filter to filter the database through, some sort of
+executable, a shell script or more for that instance. It is
+convenient to have your filters residing in the
+<b><small>$HOME/.index</small></b> or
+<b><small>$INDEXDIR</small></b> folder ending with a
+<b><small>.fmt</small></b> extension, but you can really
+choose any name you like. Filters will also be looked for in
+your <b><small>$PWD</small></b> (current working directory),
+and in the directory where the database resides, if you have
+specified a path for it. You can not specify a path for the
+filter by itself.</p>
+
+<p style="margin-left:11%;"><b>-i</b>,
+<b>--ignore-case:</b> Makes the database case insensitive
+during searches.</p>
+
+<p style="margin-left:22%; margin-top: 1em">This option
+works both for regular expressions specifed on the command
+line, and for those entered within, when <i>index</i> is
+used interactively.</p>
+
+<p style="margin-left:11%;"><b>-b</b>, <b>--verbose:</b>
+Prints out empty fields as newlines.</p>
+
+<p style="margin-left:22%; margin-top: 1em"><i>index</i>
+will not print any blank lines in the entry, in order to
+make the output more readable. By specifying the
+<b>&minus;b</b> option, you can tell <i>index</i> to print
+all lines in the entry, even if they have nothing on
+them.</p>
+
+<p style="margin-left:22%; margin-top: 1em">This works by
+default when the output is in tabular form, (one record per
+line), which is the default output format when a filter is
+in use or the <b>-H</b> option is used. Otherwise one field
+per line is printed, and it is then this option sees to that
+even empty fields are printed.</p>
+
+<p style="margin-left:11%;"><b>-s</b>, <b>--no-labels:</b>
+Don&rsquo;t prints the labels.</p>
+
+<p style="margin-left:22%; margin-top: 1em">If the database
+are printed with a field on each line, then this supresses
+output of labels. The same option is for supressing headers,
+when the <b>header</b> option is used in order to get
+tabular output, or a filter is specified. See the <b>-H</b>
+and the <b>-f</b> option.</p>
+
+<p style="margin-left:11%;"><b>-H</b>, <b>--header:</b>
+Print the labels as headers when printed without a <br>
+filter.</p>
+
+<p style="margin-left:22%; margin-top: 1em">This presents
+the data in a tabular format. One record on each line. If
+you want to have your data presented as a table, without any
+headers then you must specify <b>-H -s</b> as command line
+options. This option doesn&rsquo;t do anything when a filter
+is specified.</p>
+
+<p style="margin-left:11%;"><b>-v</b>, <b>--inverted:</b>
+Print only those records that don&rsquo;t match.</p>
+
+<p style="margin-left:22%; margin-top: 1em">This option
+works like grep -v since it is often wastly easier to create
+a reg-exp for the opposite. <b><small>See man
+re_format(7).</small></b></p>
+
+<p style="margin-left:11%;"><b>-r</b>, <b>--reverse:</b>
+Print the data in reverse ordering. Descending.</p>
+
+<p style="margin-left:22%; margin-top: 1em">Any headings
+will still be printed on top. (Of course.) This option
+doesn&rsquo;t work when the tool is used interactively.</p>
+
+<p style="margin-left:11%;"><b>-n</b>, <b>--nosql:</b>
+Trick labels into always being printed on top.</p>
+
+<p style="margin-left:22%; margin-top: 1em">The trickery is
+to put the ascii character 0X01 in front of all fields when
+used as headers to keep them on top if the output is to be
+further sorted. The character is injected after any
+field-delimiter.</p>
+
+<p style="margin-left:11%;"><b>-F</b>, <b>--field-sep:</b>
+Sets the character you want as a field separator.</p>
+
+<p style="margin-left:22%; margin-top: 1em">This works in
+tandem with the csv option. Any field delimiters that are
+found in between fields are not escaped, since we embellish
+the fields with hyphens. Any hyphens found in fields are
+escaped though, with <b><small>&quot;\&quot;</small></b> the
+backslash character. This doesn&rsquo;t work when a filter
+<b>-r</b> isn&rsquo;t specifed or the header <b>-H</b>
+option isn&rsquo;t set.</p>
+
+<p style="margin-left:11%;"><b>-c</b>, <b>--csv:</b> Output
+CSV, comma separated values.</p>
+
+<p style="margin-left:22%; margin-top: 1em">Creates comma
+separated output escaping any field-separator within fields
+with a back-slash \. This is for making it easy to export
+data from <i>index</i> into a spread sheet, a table, or
+similiar. Labels are also comma separated and any
+field-separators equally escaped. The fields separator
+sepecified by the <b>-F</b> option will be used, otherewise
+a <b>tab</b> character will be used for separating the
+fields. The <b>-H</b> option must be set, if no filter is
+specifed, in order to make this option work.</p>
+
+<p style="margin-left:11%;"><b>-q</b>, <b>--quiet:</b> No
+output.</p>
+
+<p style="margin-left:22%; margin-top: 1em">Just a dry run
+to see if there is data there that matches. No output is
+output. <b>Returns 0</b> if there were a match <b>1</b>
+otherwise. Which is the same behaviour if you try to get
+output from an empty file. <i>index</i> returns 1 if there
+were no data to ouput. It returns 0 when there is data to
+print out.</p>
+
+<p style="margin-left:22%; margin-top: 1em"><b>NB!</b> This
+option doesn&rsquo;t work when a filter is specified.</p>
+
+<p style="margin-left:11%;"><b>-h</b>, <b>--help:</b>
+Prints a rudimentary help.</p>
+
+<p style="margin-left:22%; margin-top: 1em">The long list
+of options and parameters with short explanations.</p>
+
+<p style="margin-left:11%;"><b>-u</b>, <b>--usage:</b>
+Prints a very short help.</p>
+
+<p style="margin-left:22%; margin-top: 1em">The short
+version that are shown when the command line is errounous.
+It is the old-style; containing the arguments and short
+options, for those with excellent memory!</p>
+
+<p style="margin-left:11%;"><b>-C</b>, <b>--copyright:</b>
+Prints copyright information.</p>
+
+<p style="margin-left:22%; margin-top: 1em">Shows copright
+for this public domain program and the libraries it
+leverages upon: ICU, Ncurses, and the GNU c-library.</p>
+
+<p style="margin-left:11%;"><b>-V</b>, <b>--version:</b>
+Prints version information.</p>
+
+<p style="margin-left:22%; margin-top: 1em">Version
+information for <i>index</i> and the libraries it uses.</p>
+
+<h2>CREATING A NEW DATABASE
+<a name="CREATING A NEW DATABASE"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">When you
+specify the name of a non-existent database to the database
+selection prompt, you will be placed in a text editor to
+create the database description file. This file is simply a
+list of the field names for the database, one per line. You
+may have up to 16 fields in each database. Blank lines may
+be used for continuation lines in multiple-line fields, such
+as addresses.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The database is
+always sorted by the first field. When searching the
+database, the default is to search all fields for the
+pattern. To specify that a field should be ignored in
+searching, you should place an exclamation point (!) in the
+first position on that line.</p>
+
+<p style="margin-left:11%; margin-top: 1em">When you have
+created the database description file, save the file and
+exit the editor. You will then be placed in the main menu,
+where you can manipulate the database.</p>
+
+<h2>THE MAIN MENU
+<a name="THE MAIN MENU"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The main menu
+is the point from which the database can be manipulated.
+This menu provides you with several commands:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p><b>a</b></p></td>
+<td width="10%"></td>
+<td width="78%">
+
+
+<p>Add a new entry to the database. You will be presented
+with a list of the fields in a database entry, and allowed
+to fill them in. As you type, characters are inserted at the
+current cursor location. The editing commands available are
+a subset of those provided by the <small>EMACS</small> text
+editor:</p> </td></tr>
+</table>
+
+<p style="margin-left:22%;"><b>^A</b></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%"></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em">Move the cursor to the beginning
+of the line.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^B</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Move the cursor backward one character.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^D</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Delete the character under the cursor.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^E</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Move the cursor to the end of the line.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^F</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Move the cursor forward one character.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^H</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Backspace, deleting the character in front of the
+cursor. The <small>DEL</small> key also performs this
+function.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^K</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Delete from the cursor position to the end of the
+line.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^L</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Redraw the screen.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>&lt; <small>RET</small> &gt;</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Pressing <small>RETURN</small> moves to the next line,
+column one. If you&rsquo;re on the last line, this wraps
+around to the first line.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^N</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Move to the next line, without moving to column one. If
+you&rsquo;re on the last line, this wraps around to the
+first line.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>^P</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Move to the previous line. If you&rsquo;re on the first
+line, this wraps around to the last line.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>&lt; <small>ESC</small> &gt;</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+
+
+<p>Pressing the <small>ESCAPE</small> key tells
+<i>index</i> that you&rsquo;re done editing the entry. You
+will be asked whether you want to save the entry in the
+database. If you say yes, it will be saved. If you say no,
+the data you just entered will be discarded. If you press
+<small>RETURN</small> , you will be returned to the editing
+mode.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="18%">
+
+
+<p><b>f</b></p></td>
+<td width="3%"></td>
+<td width="68%">
+</td></tr>
+</table>
+
+<p style="margin-left:22%; margin-top: 1em">Find an entry
+in the database. You will be prompted for a pattern to
+search for, and then all entries which match the pattern
+will be displayed, one at a time. The pattern may be any
+regular expression, as described in <i>ed</i>(1). Case is
+distinguished unless the <b>&minus;i</b> option was given on
+the command line. See the description of the
+&lsquo;&lsquo;<b>r</b>&rsquo;&rsquo; command for the options
+available to you with each entry displayed.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em"><b>r</b></p></td>
+<td width="10%"></td>
+<td width="78%">
+
+
+<p style="margin-top: 1em">Read the database entry by
+entry. Each entry in the database is printed on the screen,
+along with two numbers indicating the number of entries in
+the database, and the sequential index number of this entry
+(e.g., &lsquo;&lsquo;123/500&rsquo;&rsquo;). As each entry
+is printed, you will be allowed to execute the following
+commands:</p> </td></tr>
+</table>
+
+<p style="margin-left:22%;"><b>&lt; <small>RET</small>
+&gt;</b></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%"></td>
+<td width="7%"></td>
+<td width="68%">
+
+
+<p style="margin-top: 1em">Pressing the
+<small>RETURN</small> key will move to the next database
+entry.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p><b>&minus;</b></p></td>
+<td width="7%"></td>
+<td width="68%">
+
+
+<p>Return to the previous database entry.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p><b>d</b></p></td>
+<td width="7%"></td>
+<td width="68%">
+
+
+<p>Delete this entry from the database. You will be
+prompted to confirm this operation.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p><b>e</b></p></td>
+<td width="7%"></td>
+<td width="68%">
+
+
+<p>Edit this database entry. See the description of the
+main menu &lsquo;&lsquo;<b>a</b>&rsquo;&rsquo; command for a
+list of the editing commands available. After you press
+<small>ESCAPE</small> and indicate whether you wish to save
+what you have edited, you will be returned to this mode
+again.</p> </td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p><b>q</b></p></td>
+<td width="7%"></td>
+<td width="68%">
+
+
+<p>Return to the main menu without looking at the rest of
+the entries.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p><b>^L</b></p></td>
+<td width="7%"></td>
+<td width="68%">
+
+
+<p>Redraw the screen.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="14%">
+
+
+<p><b>s</b></p></td>
+<td width="7%"></td>
+<td width="68%">
+</td></tr>
+</table>
+
+<p style="margin-left:22%; margin-top: 1em">Save any
+modifications to the database.</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p style="margin-top: 1em"><b>q</b></p></td>
+<td width="10%"></td>
+<td width="78%">
+
+
+<p style="margin-top: 1em">Save any modifications to the
+database, and exit <i>index</i>.</p></td></tr>
+<tr valign="top" align="left">
+<td width="11%"></td>
+<td width="1%">
+
+
+<p><b>x</b></p></td>
+<td width="10%"></td>
+<td width="78%">
+
+
+<p>Exit <i>index</i> without saving the database. If the
+database has been modified, you will be asked to confirm
+this operation.</p></td></tr>
+</table>
+
+<h2>SEARCHING FROM THE COMMAND LINE
+<a name="SEARCHING FROM THE COMMAND LINE"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">If a database
+name and pattern are both specified on the command line, the
+pattern will be searched for in the database, and any
+matching entries will be printed on the standard output.
+Each entry will be printed one field per line, preceded by
+its field name.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The pattern may
+be any valid regular expression, as defined by <i>ed</i>(1).
+or <i>re_format(7)</i> It actually handles regular
+expressions as defined in the <i>perl</i> language. Case is
+significant, unless the <b>&minus;i</b> option is given. To
+match all entries in the database, use the regular
+expression &lsquo;&lsquo;.&rsquo;&rsquo; (matches any
+character).</p>
+
+<p style="margin-left:11%; margin-top: 1em">You should
+really embed your regularr expression in single or dobule
+hyphens so the shell doesn&rsquo;t interpret them as globbed
+filenames.</p>
+
+<h2>FILTERS
+<a name="FILTERS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">If the
+<b>&minus;f</b> option is specified with the name of a
+filter, then when a database name and pattern are also
+given, all matching entries will be sent through the filter
+program instead of to the standard output.</p>
+
+<p style="margin-left:11%; margin-top: 1em">The first line
+of output will contain the field names for the database,
+separated by tabs. Each following line will contain one
+database entry, with fields separated by tabs. This format
+is easily dealt with using programs such as
+<i>awk</i>(1).</p>
+
+<p style="margin-left:11%; margin-top: 1em">As a
+convenience, filtering programs may be stored in the
+database directory with a &lsquo;&lsquo;.fmt&rsquo;&rsquo;
+extension in their file name. The program is first searched
+for here (by adding the name extension), and if it is not
+found, it is then searched for (without the extension) in
+the standard search path.</p>
+
+<h2>EXAMPLE
+<a name="EXAMPLE"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">The following
+database description file implements a business phone number
+list. It allows three lines for the company address, and two
+lines for electronic mail addresses. The extra fields
+&lsquo;&lsquo;Product&rsquo;&rsquo; and
+&lsquo;&lsquo;Keywords&rsquo;&rsquo; can be used to provide
+additional patterns to search for (e.g., you might want to
+search for all disk vendors). The
+&lsquo;&lsquo;!&rsquo;&rsquo; character inhibits searching
+the title, address, and telephone number for patterns.</p>
+
+<p style="margin-left:11%; margin-top: 1em">Name <br>
+!Title <br>
+Company <br>
+!Address <br>
+! <br>
+! <br>
+!Phone <br>
+Electronic Mail</p>
+
+<p style="margin-left:11%; margin-top: 1em">Product <br>
+Keywords</p>
+
+<h2>LIMITATIONS
+<a name="LIMITATIONS"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Each database
+may have no more than 16 fields.</p>
+
+<p style="margin-left:11%; margin-top: 1em">You may not
+have more than 64 separate databases.</p>
+
+<p style="margin-left:11%; margin-top: 1em">A database may
+contain as many entries as you can allocate memory for.</p>
+
+<h2>SEE ALSO
+<a name="SEE ALSO"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em"><i>awk</i>(1),
+<i>ed</i>(1), <i>re_format(7)</i></p>
+
+<h2>ORIGINAL AUTHOR
+<a name="ORIGINAL AUTHOR"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">David A. Curry,
+Research Institute for Advanced Computer Science</p>
+
+<h2>AUTHOR VERSION 2.0
+<a name="AUTHOR VERSION 2.0"></a>
+</h2>
+
+
+<p style="margin-left:11%; margin-top: 1em">Tommy
+Bollman/McUsr</p>
+<hr>
+</body>
+</html>
