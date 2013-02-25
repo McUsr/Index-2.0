@@ -141,8 +141,8 @@ wchar_t
 }
 
 /* save a string in dynamically allocated memory.           */
-char
-*savestr(const char *str, const char *handler, const char *variable)
+char *
+savestr(const char *str, const char *handler, const char *variable)
 {
 	char *s;
 	s = (char *)ymalloc((strlen(str) + 1),handler,variable); 

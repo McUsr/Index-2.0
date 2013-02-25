@@ -289,7 +289,7 @@ file_is_empty( char *filename)
              return 0 ;
         }
    } else {
-       return -1 ; /* non -existent */
+       return 1 ; /* non -existent */
    }
 }
 

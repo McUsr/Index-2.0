@@ -94,23 +94,34 @@ void select_db(void)
 		}
 	}
     	*dbasename = '\0'; 
-    /* TODO: clean up this, remove it, as I don't need it, but a set
-    dbshort name in dbfname
-    */
 	/* Prompt for the name of a database.                   */
 	while (*dbasename == '\0')
 		prompt_str(spread + 2 + 3, 0, "Select a database: ", dbasename);
 
 	size_t lastcharpos = wcslen(dbasename) - 1;
-	while (dbasename[lastcharpos--] == (wchar_t) ' ') {
-		dbasename[lastcharpos] = (wchar_t) '\0';
+	while (dbasename[lastcharpos] == (wchar_t) ' ') {
+		dbasename[lastcharpos--] = (wchar_t) '\0';
 	}
+    /* any suffix here is illegal, well meaning maybe, but illegal. */
+     wchar_t *suffix = mbstowcs_alloc(DBFILE_SUFFIX) ;
+     size_t cspn =wcscspn(dbasename,suffix)  ;
+     size_t sufflen = wcslen(suffix) ;
+     if ( (cspn + sufflen) == (lastcharpos+1) ) {
+         dbasename[(lastcharpos+1) - sufflen] = (wchar_t) 0 ;
+    }
+    free(suffix) ;
+    suffix=NULL;
+   
+
     /* has to figure out where it is stored, if it is. */
     UChar *lowerExistingBase = lowercasedUString( dbasename ) ;
     wchar_t *lowerWcs = wcsStringFromUnicode(lowerExistingBase ) ;
     free(lowerExistingBase) ;
     lowerExistingBase = NULL ;
-	/* TODO: it can't have a suffix if we arrive here. */
+	/* TODO: it can't have a suffix if we arrive here.
+        That is, we have to remove the suffix if we arrive here! 
+    */
+    
     if (labelFileExists(dbasename)) {
         set_dbase_shortname(lowerWcs) ;
         free(lowerWcs) ;

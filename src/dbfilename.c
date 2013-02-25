@@ -690,6 +690,7 @@ open_label_file(void)
 	FILE *fp;
 
 	if ((fn_status & L_FULL_PATH )|| (fn_status & F_LABEL_MADE )) {
+		fprintf(stderr,"Full path is set\n") ;
 	/* 	This is the situation, if we found the index file in
 		the exists_label_file() from within select_db(). */
 		if ((fp = fopen(fulllabelname, "r")) == NULL ) {
@@ -702,7 +703,8 @@ open_label_file(void)
 	albeit non-existing.)
 	if we had a filaname, then we passed by select_db(). */	
 	/* we need to create baselabelfname first! */
-	
+	fprintf(stderr,"stemdbname == %s\n",stemdbname ) ;
+	fprintf(stderr," len stemdbname = %u\n",strlen(stemdbname) );	
 	size_t baselabelStorage = strlen(stemdbname) + strlen(IDXFILE_SUFFIX) + 1 ;
 	
 	char *baselabelname = (char *) ymalloc(baselabelStorage,procname,"baselabelname") ; 
