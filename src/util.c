@@ -46,6 +46,8 @@ static const char *errstrings[] = {
 	"%s: in %s: cannot fork a process for %s",
 	"%s: ICU string conversion from UTF8 erred in %s for variable : %s",
 	"%s: ICU preflight string conversion from UTF8 erred in %s for variable : %s",
+	"%s: ICU string conversion to UTF8 erred in %s for variable : %s",
+	"%s: ICU preflight string conversion to UTF8 erred in %s for variable : %s",
     } ;
 
 static char *pname = NULL;	/* program name     */
