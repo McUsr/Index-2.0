@@ -187,7 +187,8 @@ static int load_dblist(wchar_t * dblist[MAXDBFILES])
 				strncpy(tmpFn, d->d_name, slen);
 				tmpFn[slen] = '\0';
 
-				ucsz = (int32_t) slen * 4;
+				ucsz = (int32_t) slen +1  ;
+			/*	ucsz = (int32_t) slen * 4; */
 
 				ucs =
 				    (UChar *) ymalloc(((size_t) ucsz * sizeof(UChar)),procname,ucsname);

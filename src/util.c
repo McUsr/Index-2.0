@@ -131,6 +131,7 @@ wchar_t
 wchar_t
 *makewstr(const char *handler, const char *variable)
 {
+    /* TODO: BUFSIZ, skal bli 254 */
     size_t newwcslen = BUFSIZ * sizeof(wchar_t) ;
 	wchar_t *w = (wchar_t *) ymalloc(newwcslen,handler,variable);
     memset(w,0,newwcslen ) ;

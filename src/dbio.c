@@ -465,7 +465,8 @@ read_database()
 		for (i = 0; i < idx.idx_nlines; i++) {	/* GLOBAL */
 			/* If we hit end of file before getting complete    */
 			/* entry, then toss this one.                       */
-			if (fgets(mbsbuf, (int)(BUFSIZ * sizeof(char)), fp) ==
+            /* TODO: BUFSIZ skiftes ut */
+			if (fgets(mbsbuf, (int)BUFSIZ, fp) ==
 			    NULL)
 				goto out;
 			register size_t mbuflen = (strlen(mbsbuf) - 1);

@@ -93,7 +93,7 @@ int32_t patternFromWcs(wchar_t * wcharPattern)
 {
 	size_t wlen = wcslen(wcharPattern);
 
-	int32_t uchCap = wlen * 2 + 1, ucslen = 0;
+	int32_t uchCap = wlen * 4 + 1, ucslen = 0;
 
 	re_pattern = (UChar *) ymalloc(((size_t) uchCap * sizeof(UChar)),"patternFromWcs","re_pattern");
 	ucslen = unicodeFromWcs(re_pattern, uchCap, wcharPattern, wlen);
