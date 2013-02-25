@@ -27,9 +27,6 @@
 #ifdef TEST
 #define  DBG_FINDRECORDS  1
 #endif
-										     /* extern dbrecord *db;   *//* array of database entries    */
-									   /* extern idxfile idx; *//* index definition structure   */
-/* TODO: bare ha en error message string på say 256 chars  */
 extern char dbasedir[];		/* path to the INDEXDIR         */
 static wchar_t wpattern[BUFSIZ] = { L"" };
 
@@ -152,8 +149,9 @@ void find_entry(void)
 			disp_entries();
 
 			/* Clear DB_PRINT flags for next search.            */
-			for (i = 0; i < dbentries; i++)
+			for (i = 0; i < dbentries; i++) {
 				db[i].db_flag &= ~DB_PRINT;
+            }
 		} else if (srch_res == -1) {
 
 			/* There was an error in the RE.                     */
@@ -171,6 +169,8 @@ void find_entry(void)
 				    "\n\r");
 		}
 	}
+    free(re_pattern ) ;
+    re_pattern = NULL ;
 	wpattern[0] = (wchar_t) '\0';
 }
 
@@ -196,7 +196,6 @@ void find_entry(void)
  *
  *
  */
-/* bug i edit entry når står i nullte posisjon og trykker backspace. */
 int search_db(UChar * src_pattern, int32_t plen)
 {
 	uint32_t flags = 0;
