@@ -266,7 +266,7 @@ UChar *lowercasedUString(wchar_t *wcsS)
         y_icuSimpleError(
             "Index: lowercasedUString: error during lowercase of lowerChosenBase.",status);
 	}
-	lowerChosenBase = (char *)yrealloc(lowerChosenBase, u_strlen(lowerChosenBase) ,
+	lowerChosenBase = (UChar *)yrealloc(lowerChosenBase, sizeof(UChar) * u_strlen(lowerChosenBase) ,
         procname,lowerbasename);
     return  lowerChosenBase ;
 }
