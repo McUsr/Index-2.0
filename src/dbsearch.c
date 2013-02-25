@@ -132,7 +132,7 @@ void find_entry(void)
 	while (pat_result == -1) {
 		prompt_str(LINES / 2, 0, "Pattern to search for: ", wpattern);
         if (wcslen(wpattern) == 0 ) {
-            continue ;
+            break ;
         }
          
 
@@ -169,7 +169,7 @@ void find_entry(void)
 	}
     free(re_pattern ) ;
     re_pattern = NULL ;
-	wpattern[0] = (wchar_t) '\0';
+/*	wpattern[0] = (wchar_t) '\0'; */
 }
 
 /*

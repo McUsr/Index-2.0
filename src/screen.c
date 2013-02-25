@@ -170,7 +170,9 @@ prompt_str(int row, int col, const char *promptstr, wchar_t * answer)
 	/* Calc "column zero", which is at right end of prompt.     */
 	col += wcslen(wpromptstr);
 	col0 = col;
-	len = 0;
+	mvaddwstr(row, col, answer);
+    len = wcslen(answer) ;
+    col += len ; 
 	/* Read chars till we get what we want. Useris allowed      */
 	/* basic EMACS-style line editing.                          */
 	while ((code = get_wch(&ch)) != EOF) {
@@ -223,13 +225,13 @@ prompt_str(int row, int col, const char *promptstr, wchar_t * answer)
 			/* If stuff in the string, delete char.             */
 			if (len && ((col - 1) >= col0)) {
 				/* Calc pos in string of char to delete         */
-				i = col - col0 - 1;
-				if (i < 0)
+				int l = col - col0 - 1;
+				if (l < 0)
 					break;
 				/* Shuffle the string "left" one place.         */
-				while (i < len) {
-					line[i] = line[i + 1];
-					i++;
+				while (l < len) {
+					line[l] = line[l + 1];
+					l++;
 				}
 
 				len -= 1;
