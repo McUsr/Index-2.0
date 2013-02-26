@@ -1,4 +1,8 @@
-/* common.h:
+/* common.h
+ * common headers for all the files in the project.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * common includes for the index project.
  */
 #define _DARWIN_FEATURE_64_BIT_INODE

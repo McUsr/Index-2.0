@@ -7,9 +7,13 @@
  * This version acknowledges Mac OsX's unicode filenames,
  * Utf-8, and sorting with respect to locale.
  * Tommy Bollman/McUsr 2013.02.06
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include <common.h>
-#include <initcurses.h>
+#include "common.h"
+#include "initcurses.h"
 
 /* constants for writing to error-messages to  the screen correctly */
 #define SCR_INACTIVE 0x0

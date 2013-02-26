@@ -117,7 +117,29 @@ install:
 	@command cp -f index $(BINDIR)
 	@ls -l $(BINDIR)/index
 #	cp -f man1/index.1 $(MANDIR)
+#   DOCS
+
+install-exec:
+	echo "INSTALLS ONLY ARCHIECTURE DEPENDENT FILES"
 	
+install-data:
+	echo "INSTALLS ALL THE REST"
+
+install-strip:
+	echo "STRIPS DEBUG INFO"
+
+uninstall:
+	echo "UNINSTALLS"
+
+installcheck:
+	echo "INSTALL CHECK IS LACKING"
+
+distclean:
+	echo "REMOVE ANYTHING .CONFIGURE CREATED"
+
+check:
+	echo "RUNS TEST SUITE?"
+
 clean:
 	-@$(RM) $(wildcard $(OBJFILES) $(DEPFILES) $(TSTFILES) index)
 	-@$(RM) $(wildcard $(DBGOBJFILES) $(DEPFILES) $(TSTFILES) index)

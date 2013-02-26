@@ -14,19 +14,23 @@
  * This version acknowledges Mac OsX's unicode filenames,
  * Utf-8, and sorting with respect to locale.
  * Tommy Bollman/McUsr 2013.02.06
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include <common.h>
-#include <unicodeToUtf8.h>
-#include <defs.h>
-#include <initcurses.h>
-#include <util.h>
-#include <dbio.h>
-#include <screen.h>
-#include <dbfunc.h>
-#include <dbfilename.h>
+#include "common.h"
+#include "unicodeToUtf8.h"
+#include "defs.h"
+#include "initcurses.h"
+#include "util.h"
+#include "dbio.h"
+#include "screen.h"
+#include "dbfunc.h"
+#include "dbfilename.h"
 #ifdef TESTING
-#include <locale.h>
-#include <dbselect.h>
+#include "locale.h"
+#include "dbselect.h"
 #include "regsort.h"
 #endif
 

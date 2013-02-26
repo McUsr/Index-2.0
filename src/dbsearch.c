@@ -14,16 +14,19 @@
  * Utf-8, and sorting with respect to locale.
  * Tommy Bollman/McUsr 2013.02.06
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include <common.h>
-#include <unicodeToUtf8.h>
-#include <initcurses.h>
-#include <defs.h>
-#include <dbfunc.h>
-#include <screen.h>
-#include <dbio.h>
-#include <dbsearch.h>
-#include <util.h>
+#include "common.h"
+#include "unicodeToUtf8.h"
+#include "initcurses.h"
+#include "defs.h"
+#include "dbfunc.h"
+#include "screen.h"
+#include "dbio.h"
+#include "dbsearch.h"
+#include "util.h"
 #ifdef TEST
 #define  DBG_FINDRECORDS  1
 #endif

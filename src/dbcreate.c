@@ -14,16 +14,20 @@
  * This version acknowledges Mac OsX's unicode filenames,
  * Utf-8, and sorting with respect to locale.
  * Tommy Bollman/McUsr 2013.02.06
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <common.h>
-#include <defs.h>
-#include <util.h>
-#include <dbfunc.h>
-#include <initcurses.h>
-#include <screen.h>
-#include <dbfilename.h>
-#include <dbcreate.h>
+#include "common.h"
+#include "defs.h"
+#include "util.h"
+#include "dbfunc.h"
+#include "initcurses.h"
+#include "screen.h"
+#include "dbfilename.h"
+#include "dbcreate.h"
 /* The message we'll print to explain what's happening.         */
 /* It is hard to convert this, as long as the string contains   */
 /* A format.                                                    */

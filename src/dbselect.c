@@ -15,17 +15,20 @@
  * Utf-8, and sorting with respect to locale.
  * Tommy Bollman/McUsr 2013.02.06
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include <common.h>
-#include <unicodeToUtf8.h>
-#include <initcurses.h>
-#include <defs.h>
-#include <dbio.h>
-#include <screen.h>
-#include <dbcreate.h>
-#include <util.h>
-#include <dbfilename.h>
-#include <dbselect.h>
+#include "common.h"
+#include "unicodeToUtf8.h"
+#include "initcurses.h"
+#include "defs.h"
+#include "dbio.h"
+#include "screen.h"
+#include "dbcreate.h"
+#include "util.h"
+#include "dbfilename.h"
+#include "dbselect.h"
 
 
 extern UCollator *compareCollator;

@@ -1,6 +1,11 @@
 /* dbfilename.c - database filename routines 
 this module is used in index ver 2.0 that 
 is derived from index 1.0 by David A. Curry.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
 Purpose
 =======
 
@@ -32,11 +37,11 @@ TODO:
 		Update the comments further, factor out check basename.
 
  */
-#include <common.h>
-#include <unicodeToUtf8.h>
-#include <util.h> 
-#include <defs.h>
-#include <dbfilename.h>
+#include "common.h"
+#include "unicodeToUtf8.h"
+#include "util.h" 
+#include "defs.h"
+#include "dbfilename.h"
  
 static FILE * openFromDir(char *fname, char *filedir ) ;
 static FILE * openLabelFileFromDir(char *fname, char *filedir ) ;

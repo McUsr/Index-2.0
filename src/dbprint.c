@@ -14,16 +14,19 @@
  * Utf-8, and sorting with respect to locale.
  * Tommy Bollman/McUsr 2013.02.06
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#include <common.h>
-#include <initcurses.h>
-#include <unicodeToUtf8.h>
-#include <defs.h>
-#include <dbfunc.h>
-#include <util.h>
-#include <dbio.h>
-#include <dbfilename.h>
-#include <dbprint.h>
+#include "common.h"
+#include "initcurses.h"
+#include "unicodeToUtf8.h"
+#include "defs.h"
+#include "dbfunc.h"
+#include "util.h"
+#include "dbio.h"
+#include "dbfilename.h"
+#include "dbprint.h"
  
 static int quiet = 0 ;
 

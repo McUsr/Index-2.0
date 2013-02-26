@@ -1,5 +1,10 @@
 /* vim: nospell:fenc=utf-8:ft=c:et:sw=4:ts=4:sts=4:ro
 
+  Copyright T.Bollman/McUsr and put into public domain.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   unicdodeToUtf8: a small library for handling unicode text.  It relies
   totally on ICU's unicode library. see licence.text.
 
@@ -97,10 +102,10 @@ free to do so, and responsible for the results.
   Tommy Bollman/McUsr 2013.02.25
 
  */
-#include <common.h>
-#include <defs.h>
-#include <util.h>
-#include <unicodeToUtf8.h>
+#include "common.h"
+#include "defs.h"
+#include "util.h"
+#include "unicodeToUtf8.h"
 #ifdef TESTING
 int main(void)
 {

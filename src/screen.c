@@ -15,19 +15,19 @@
  * Utf-8, and sorting with respect to locale.
  * Tommy Bollman/McUsr 2013.02.06
  *
- 
- does this work now?
- this is a test.:w
-
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
  */
-#include <common.h>
-#include <unicodeToUtf8.h>
-#include <initcurses.h>
-#include <defs.h>
-#include <util.h>
-#include <dbio.h>
-#include <screen.h>
-#include <dbfilename.h>
+#include "common.h"
+#include "unicodeToUtf8.h"
+#include "initcurses.h"
+#include "defs.h"
+#include "util.h"
+#include "dbio.h"
+#include "screen.h"
+#include "dbfilename.h"
 
 /* TODO: comment your statics! */
 static int ConvertCh(chtype source, cchar_t * target);
