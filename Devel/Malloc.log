@@ -1,0 +1,50 @@
+index(2043) malloc: checks heap after 1th operation and each 1000 operations
+index(2043) malloc: will sleep for 100 seconds on heap corruption
+cat(2045) malloc: checks heap after 1th operation and each 1000 operations
+cat(2045) malloc: will sleep for 100 seconds on heap corruption
+cat(2047) malloc: checks heap after 1th operation and each 1000 operations
+cat(2047) malloc: will sleep for 100 seconds on heap corruption
+grep(2050) malloc: checks heap after 1th operation and each 1000 operations
+grep(2050) malloc: will sleep for 100 seconds on heap corruption
+leaks(2051) malloc: checks heap after 1th operation and each 1000 operations
+leaks(2051) malloc: will sleep for 100 seconds on heap corruption
+leaks(2051) malloc: checks heap after 1th operation and each 1000 operations
+leaks(2051) malloc: will sleep for 100 seconds on heap corruption
+leaks(2055) malloc: checks heap after 1th operation and each 1000 operations
+leaks(2055) malloc: will sleep for 100 seconds on heap corruption
+leaks(2055) malloc: checks heap after 1th operation and each 1000 operations
+leaks(2055) malloc: will sleep for 100 seconds on heap corruption
+bash(2062) malloc: checks heap after 1th operation and each 1000 operations
+bash(2062) malloc: will sleep for 100 seconds on heap corruption
+basename(2063) malloc: checks heap after 1th operation and each 1000 operations
+basename(2063) malloc: will sleep for 100 seconds on heap corruption
+basename(2065) malloc: checks heap after 1th operation and each 1000 operations
+basename(2065) malloc: will sleep for 100 seconds on heap corruption
+basename(2067) malloc: checks heap after 1th operation and each 1000 operations
+basename(2067) malloc: will sleep for 100 seconds on heap corruption
+basename(2069) malloc: checks heap after 1th operation and each 1000 operations
+basename(2069) malloc: will sleep for 100 seconds on heap corruption
+basename(2071) malloc: checks heap after 1th operation and each 1000 operations
+basename(2071) malloc: will sleep for 100 seconds on heap corruption
+basename(2073) malloc: checks heap after 1th operation and each 1000 operations
+basename(2073) malloc: will sleep for 100 seconds on heap corruption
+basename(2075) malloc: checks heap after 1th operation and each 1000 operations
+basename(2075) malloc: will sleep for 100 seconds on heap corruption
+basename(2077) malloc: checks heap after 1th operation and each 1000 operations
+basename(2077) malloc: will sleep for 100 seconds on heap corruption
+basename(2079) malloc: checks heap after 1th operation and each 1000 operations
+basename(2079) malloc: will sleep for 100 seconds on heap corruption
+basename(2081) malloc: checks heap after 1th operation and each 1000 operations
+basename(2081) malloc: will sleep for 100 seconds on heap corruption
+basename(2083) malloc: checks heap after 1th operation and each 1000 operations
+basename(2083) malloc: will sleep for 100 seconds on heap corruption
+basename(2085) malloc: checks heap after 1th operation and each 1000 operations
+basename(2085) malloc: will sleep for 100 seconds on heap corruption
+basename(2087) malloc: checks heap after 1th operation and each 1000 operations
+basename(2087) malloc: will sleep for 100 seconds on heap corruption
+basename(2089) malloc: checks heap after 1th operation and each 1000 operations
+basename(2089) malloc: will sleep for 100 seconds on heap corruption
+basename(2091) malloc: checks heap after 1th operation and each 1000 operations
+basename(2091) malloc: will sleep for 100 seconds on heap corruption
+cat(2093) malloc: checks heap after 1th operation and each 1000 operations
+cat(2093) malloc: will sleep for 100 seconds on heap corruption
