@@ -1,6 +1,16 @@
 Changelog for index 2.0
 =======================
 
+
 The starting changelog for Index version 2.0
 
 Read news for all changes incorporated up to this point.
+
+2013-03-04 : cleaning up the build system preparing for autotools
+			Makefile moved into Devel folder together with other tools.
+			If you want to develop and use my makefile, then see to that
+			you have a clean project by having run the appropriate "clean"
+			command to remove the autotool configuration, make files etc,
+			and link the Makefile in the Devel folder with:
+			"ln -s Devel/Makefile Makefile", when you are standing in the 
+			root of the project (right above the source folder).
