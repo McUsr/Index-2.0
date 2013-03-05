@@ -61,6 +61,7 @@ config.status: $(srcdir)/configure
 
 
 chkstuff:
+	@echo @DEFS@
 	@echo $(srcdir)
 	@echo $(SRCFILES)
 	@echo $(HEADERFILES)
