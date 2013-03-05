@@ -1,0 +1,59 @@
+# @configure_input@
+
+# Package-related substitution variables
+package        = @PACKAGE_NAME@
+version        = @PACKAGE_VERSION@
+tarname        = @PACKAGE_TARNAME@
+distdir        = $(tarname)-$(version)
+LIBS		   = @LIBS@
+LDFLAGS 		= @LDFLAGS@
+CFLAGS	   		= @CFLAGS@
+
+
+# Prefix-related substitution variables
+prefix         = @prefix@
+exec_prefix    = @exec_prefix@
+bindir         = @bindir@
+
+srcdir			 = @srcdir@
+VPATH			 = @srcdir@
+
+SRCFILES := $(shell find $(srcdir) -type f -name "*.c")
+# export SRCFILES := $(subst $(SRCDIR)/,,$(SOURCES)) 
+TOBJFILES  = $(subst $(srcdir)/,,$(SRCFILES)) 
+OBJFILES  := $(patsubst %.c,%.o,$(TOBJFILES)) 
+# Package-related substitution variables
+all: index
+
+# $(OBJFILES)
+#	gcc -g -O0 -o $@ $+
+
+index: $(OBJFILES)
+	gcc -g -O0 -o $@ $+ $(LDFLAGS) $(LIBS)
+	
+install:
+	install -d $(DESTDIR)/bin
+	install -m 0755 index $(DESTDIR)/bin
+
+uninstall:
+	-rm -f $(DESTDIR)/bin
+
+clean:
+	-rm index
+
+Makefile: Makefile.in ../config.status
+	cd .. && ./config.status $@
+
+../config.status: $(srcdir)/../configure
+	cd .. && ./config.status --recheck
+
+libcheck:
+	echo $(LIBS)
+	
+hdrcheck:
+	echo $(CFLAGS)
+	
+objcheck:
+	echo $(OBJFILES)
+	
+.PHONY: all clean check install uninstall

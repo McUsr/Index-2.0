@@ -1,0 +1,69 @@
+# @configure_input@
+
+# Package-related substitution variables
+package        = @PACKAGE_NAME@
+version        = @PACKAGE_VERSION@
+tarname	= @PACKAGE_TARNAME@
+distdir	= $(tarname)-$(version)
+
+# Prefix-related substitution variables
+prefix	 = @prefix@
+exec_prefix    = @exec_prefix@
+bindir	 = @bindir@
+srcdir			 = @srcdir@
+VPATH			 = @srcdir@
+
+# SRCDIR   := src
+INCDIR   := $(srcdir)/src
+PROJDIRS := $(SRCDIR) 
+
+SRCFILES := $(shell find $(srcdir)/src -type f -name "*.c")
+HEADERFILES := $(shell find $(srcdir)/src -type f -name "*.h")
+
+
+all clean index objcheck:
+	$(MAKE) -C src $@
+
+dist: $(distdir).tar.gz
+
+$(distdir).tar.gz: FORCE $(distdir)
+	tar chof - $(distdir) |\
+	gzip -9 -c >$(distdir).tar.gz
+	rm -rf $(distdir)
+
+$(distdir):
+		mkdir -p $(distdir)/src
+		cp $(srcdir)/configure $(distdir)
+		cp $(srcdir)/Makefile.in $(distdir)
+		cp $(srcdir)/src/Makefile.in $(distdir)/src
+		cp $(SRCFILES) $(distdir)/src
+		cp $(HEADERFILES) $(distdir)/src
+
+FORCE:
+	-rm $(distdir).tar.gz &>/dev/null
+	-rm -rf $(distdir) &>/dev/null
+
+distcheck: $(distdir).tar.gz
+		gzip -cd $+ | tar xvf -
+		cd $(distdir); ./configure
+		$(MAKE) -C $(distdir) all # check
+		$(MAKE) -C $(distdir) \
+		DESTDIR=$${PWD}/$(distdir)/_inst \
+		install uninstall
+		$(MAKE) -C $(distdir) clean
+		rm -rf $(distdir)
+		@echo "*** Package $(distdir).tar.gz is\
+ready for distribution."
+
+Makefile: Makefile.in config.status
+	./config.status $@
+
+config.status: $(srcdir)/configure
+	./config.status --recheck
+
+
+chkstuff:
+	@echo $(srcdir)
+	@echo $(SRCFILES)
+	@echo $(HEADERFILES)
+.PHONY: FORCE all clean dist
