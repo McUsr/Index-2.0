@@ -29,7 +29,7 @@ all: index
 #	gcc -g -O0 -o $@ $+
 
 index: $(OBJFILES)
-	gcc @DEFS@ -g -O0 -o $@ $+ $(LDFLAGS) $(LIBS)
+	gcc @DEFS@ -g -O0 -I. -I$(srcdir) -I.. -o $@ $+ $(LDFLAGS) $(LIBS)
 	
 install:
 	install -d $(DESTDIR)/bin
