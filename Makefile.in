@@ -13,13 +13,9 @@ bindir	 = @bindir@
 srcdir			 = @srcdir@
 VPATH			 = @srcdir@
 
-# SRCDIR   := src
-INCDIR   := $(srcdir)/src
-PROJDIRS := $(SRCDIR) 
 
 SRCFILES := $(shell find $(srcdir)/src -type f -name "*.c")
 HEADERFILES := $(shell find $(srcdir)/src -type f -name "*.h")
-
 
 all clean index objcheck:
 	$(MAKE) -C src $@
@@ -34,6 +30,8 @@ $(distdir).tar.gz: FORCE $(distdir)
 $(distdir):
 		mkdir -p $(distdir)/src
 		cp $(srcdir)/configure $(distdir)
+		cp $(srcdir)/configh.in $(distdir)
+		cp $(srcdir)/install-sh $(distdir)
 		cp $(srcdir)/Makefile.in $(distdir)
 		cp $(srcdir)/src/Makefile.in $(distdir)/src
 		cp $(SRCFILES) $(distdir)/src
