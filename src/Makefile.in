@@ -18,6 +18,11 @@ bindir         = @bindir@
 srcdir			 = @srcdir@
 VPATH			 = @srcdir@
 
+CC				= @CC@
+CFLAGS 			= @CFLAGS@
+CPPFLAGS		= @CPPFLAGS@
+
+
 SRCFILES := $(shell find $(srcdir) -type f -name "*.c")
 # export SRCFILES := $(subst $(SRCDIR)/,,$(SOURCES)) 
 TOBJFILES  = $(subst $(srcdir)/,,$(SRCFILES)) 
@@ -29,7 +34,7 @@ all: index
 #	gcc -g -O0 -o $@ $+
 
 index: $(OBJFILES)
-	gcc @DEFS@ -g -O0 -I. -I$(srcdir) -I.. -o $@ $+ $(LDFLAGS) $(LIBS)
+	$(CC) @DEFS@  $(CFLAGS) $(CPPFLAGS) -g -I. -I$(srcdir) -I.. -o $@ $+ $(LDFLAGS) $(LIBS)
 	
 install:
 	install -d $(DESTDIR)/bin
