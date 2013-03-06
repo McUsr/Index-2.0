@@ -114,7 +114,7 @@ build in or build directly in the source folder.
 Preliminaries
 -------------
 I'll take this a little bit slow in case this is the first time you
-are using a configure script. Go to ** Configuring the project** if
+are using a configure script. Go to **Configuring the project** if
 I am boring you.
 
 The C-compiler environment uses a series of environment variables
@@ -133,14 +133,19 @@ CPPFLAGS		: This variable contains flags and defines for the
 C-preprocessor. The most important ones coming to my mind is ther
 **-Iincludepath**
 
-LDFLAGS			: This variable contains flags for the linking stager
-of the compilation, or linker if a separate linker is used. The most common
-usage is to specify the path to the libraries, you may have to specify the paths
-to something like -L/opt/lib, or similar to make configure find the **ICU-libs**
-and the **ncursesw** libraries.
+LDFLAGS			: This variable contains flags for the linking
+stager of the compilation, or linker if a separate linker is used. The
+most common usage is to specify the path to the libraries, you may have
+to specify the paths to something like -L/opt/lib, or similar to make
+configure find the **ICU-libs** and the **ncursesw** libraries.
 
 LIBS 			: This variable is for specifying libraries directly
 you will have no usage of this variable during this configure.
+
+Configuring the project
+-----------------------
+1.	You should really try ./configure --help to see the options,
+I'll go through the most important settings or those that works here.
 
 Make configuration ------------------
 
