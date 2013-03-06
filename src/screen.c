@@ -20,6 +20,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 #include "common.h"
 #include "unicodeToUtf8.h"
 #include "initcurses.h"

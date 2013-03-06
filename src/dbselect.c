@@ -19,6 +19,9 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 #include "common.h"
 #include "unicodeToUtf8.h"
 #include "initcurses.h"
@@ -230,8 +233,8 @@ static int load_dblist(wchar_t * dblist[MAXDBFILES])
         y_icuerror( YICU_CRECOLL_ERR, procname, "compareCollator", status ) ;
 	}
 	ucol_close(compareCollator);
-
-	for (int i = 0; i < ndbs; i++) {
+    register int i = 0 ;
+	for (i = 0; i < ndbs; i++) {
 
 		int32_t ul = u_strlen(uchList[i]);
 

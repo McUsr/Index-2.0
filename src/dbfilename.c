@@ -37,6 +37,9 @@ TODO:
 		Update the comments further, factor out check basename.
 
  */
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 #include "common.h"
 #include "unicodeToUtf8.h"
 #include "util.h" 
