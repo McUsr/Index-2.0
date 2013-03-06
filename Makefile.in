@@ -8,11 +8,13 @@ distdir			= $(tarname)-$(version)
 # Prefix-related substitution variables
 prefix	 		= @prefix@
 exec_prefix		= @exec_prefix@
+datarootdir		= @datarootdir@
+datadir			= @datadir@
 bindir			= @bindir@
 srcdir			= @srcdir@
 VPATH			= @srcdir@
-mandir			= /man/man1
-MANPATH			= $(prefix)/share$(mandir)
+mandir			= @mandir@
+# mandir			= /man/man1
 INSTALL        	= @INSTALL@
 INSTALL_DATA   	= @INSTALL_DATA@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@
@@ -28,12 +30,12 @@ all clean index objcheck:
 install:
 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) -m 0755 index $(DESTDIR)$(bindir)
-	$(INSTALL_PROGRAM) -d $(MANPATH)
-	$(INSTALL_PROGRAM) -m 0755 $(srcdir)/man1/index.1 $(MANPATH)
+	$(INSTALL_PROGRAM) -d $(mandir)/man1
+	$(INSTALL_PROGRAM) -m 0755 $(srcdir)/man1/index.1 $(mandir)/man1
 
 uninstall:
 	-rm -f $(DESTDIR)$(bindir)/index
-	-rm -f $(MANPATH)/index.1
+	-rm -f $(mandir)/man1/index.1
 
 
 dist: $(distdir).tar.gz
@@ -65,7 +67,7 @@ distcheck: $(distdir).tar.gz
 		$(MAKE) -C $(distdir) all # check
 		$(MAKE) -C $(distdir) \
 		DESTDIR=$${PWD}/$(distdir)/_inst \
-		MANPATH=$${PWD}/$(distdir)/_inst/share/$(mandir) \
+		mandir=$${PWD}/$(distdir)/_inst/share/man/man1 \
 		install uninstall
 		$(MAKE) -C $(distdir) clean
 		rm -rf $(distdir)
@@ -80,6 +82,9 @@ config.status: $(srcdir)/configure
 
 
 chkstuff:
+	@echo mandir: $(mandir)
+	@echo datarootdir: $(datarootdir)
+	@echo datadir: $(datadir)
 	@echo $(MANPATH)
 	@echo $(INSTALL_PROGRAM)
 	@echo @DEFS@
