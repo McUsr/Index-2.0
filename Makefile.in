@@ -19,13 +19,17 @@ INSTALL        	= @INSTALL@
 INSTALL_DATA   	= @INSTALL_DATA@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@
 INSTALL_SCRIPT 	= @INSTALL_SCRIPT@
-
+strip_prog 		= @strip_prog@
 
 SRCFILES := $(shell find $(srcdir)/src -type f -name "*.c")
 HEADERFILES := $(shell find $(srcdir)/src -type f -name "*.h")
 
 all clean index objcheck:
 	$(MAKE) -C src $@
+	
+install-strip: install
+	 @which $(strip_prog)
+	-@$(strip_prog) $(DESTDIR)$(bindir)/index
 	
 install:
 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(bindir)
@@ -103,6 +107,7 @@ config.status: $(srcdir)/configure
 
 
 chkstuff:
+	@echo strip_prog: @strip_prog@
 	@echo docdir: $(docdir)
 	@echo mandir: $(mandir)
 	@echo datarootdir: $(datarootdir)

@@ -88,6 +88,8 @@ AC_FUNC_FORK
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_CHECK_FUNCS([getcwd memset realpath setlocale strchr strerror strrchr strstr])
+AC_CHECK_PROG([strip_prog],[strip],[strip],,,)
+
 AC_CONFIG_FILES([Makefile
 src/Makefile])
 
