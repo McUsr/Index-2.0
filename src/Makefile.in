@@ -34,8 +34,10 @@ all: index
 
 index: $(OBJFILES)
 	$(CC) $(CFLAGS) $(DEFS)  $(CPPFLAGS) -g -I. -I$(srcdir) -I.. -o ../$@ $+ $(LDFLAGS) $(LIBS)
+
 clean:
-	-rm index
+	-rm ../index
+	-rm $(OBJFILES)
 
 Makefile: Makefile.in ../config.status
 	cd .. && ./config.status $@
