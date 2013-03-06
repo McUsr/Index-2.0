@@ -2,22 +2,23 @@ Index-2.0
 =========
 
 David A. Curry's index, now for Utf-8 and local collation order, for
-Mac Os X, but portable. Uses ICU.
+Mac Os X, but portable. Uses ICU for i8n and l10n.
 
 About Index-2.0
 ---------------
 
 It is very effective in many respects.
 --------------------------------------
+
 This is a tremendously useful little tool, for creating a small
-"databases" you needed yesterday.  It takes to secs, from the thought of
-it would be cool to have a "database" before you are entering records,
-records that you can later filter with awk and other tools. The duality of
-the tool, working both as a "screen" program, and as a filter, makes it
-very useful, in supporting note-taking in a diverging stage of whatever,
-without a thought about structuring there and then.  But you can later
-converge the semantics of your "data", by filtering the information you
-have gathered through it.
+"databases" you needed yesterday.  It takes two secs, from the thought
+of it would be cool to have a "database" before you have defined the
+database and are eagerly entering records, records that you can later
+filter with awk and other tools. The duality of the tool, working both as
+a "screen" program, and as a filter, makes it very useful, in supporting
+note-taking in a diverging stage of whatever, without a thought about
+structuring there and then.  But you can later converge the semantics
+of your "data", by filtering the information you have gathered through it.
 
 It supports international encoding schemes.
 -------------------------------------------
@@ -55,23 +56,84 @@ and maybe there are some reallocations to be added for max-memory
 efficiency given the fact that I have been more concerned about the 
 calulations to work at all times, than being memory efficient.
 
-The tool as such is now finished, give or take any bug I may find in the
-near future. I guess I won't but never say never.
+**Edit** Having implemented the autotools for creating cross platform
+configure scripts and compilation, I am now revising stuff, and removing
+the last (small) memory deallocation bugs.
+
+I'll also have to implement the config.h, and specifying different
+default text editors and such for different platforms when $EDITOR
+isn't specified.
 
 Maybe there is something at miss when it comes to adhering to the GNU
 coding standard, but not much.
 
 How to build
-------------
+============
 
-It is built by a makefile, and for the moment it is assumed that you are
-using Mac OS X Leopard or later. To build it, you'll also need Ncurses,
-as I uses cursesw.a when building it.
+OS X Leopard or later:
+----------------------
 
-Ncurses 5.9 can be easily downloaded from http://www.macports.org.
+It is easier to build this on OS X than any other platform, since it
+was developed here. But from now onwards, it is recommonded that you
+use the configure script, that generates makefiles.
 
-Make configuration
-------------------
+The configure script supports staged installs, so that you can create a
+folder, and make the tool in there, not mingling with the source.
+You can of course "make install" from this directory.
+
+You'll need Ncurses 5.9 or later in addtion to what is delivered with
+OS X in order to build.
+
+Ncurses 5.9 can be easily downloaded from http://www.macports.org. for
+OS X
+
+Other platforms
+---------------
+
+I have no hopes about this being easy to install under cygwin or anything
+but since GNU autotools are used, I suppose it wont't be impossible.
+
+If this is your case, and you face problems, don't hesitate to take
+contact.
+
+General prequisites
+-------------------
+
+You need to install and compile Ncurses 5.9 and ICU 4.9 or later
+Having this in shape, and the paths to where it is installed, then
+it is time to perform the installation.
+
+
+1. The Configuration
+====================
+
+Stand in the root of the project. (Same directory as you found this
+document.) It is your call whether you want to create a folder to
+build in or build directly in the source folder.
+
+I'll take this a little bit slow in case this is the first time you
+are using a configure script.
+
+The C-compiler environment uses a series of environment variables
+for setting flags, and finding stuff, you can set those variables
+with your particular options.
+
+The variables are:
+
+* CFLAGS 		: This variable should contain the compiler options
+like -g, -O2 and so on. Those are the settings you want to set in
+additon to those set in the makefile. (-g is always set, if you really
+want to strip out the debug information, then "make install-strip"
+afterwards.)
+
+CPPFLAGS
+
+LDFLAGS
+
+LIBS
+
+
+Make configuration ------------------
 
 I urge you to read the makefile carefully, it builds as both an X86_64
 and i386 executable.
@@ -80,20 +142,18 @@ You can use a stand alone ICU library, but I have chosen to use the
 ICU that ships with Mac Os X, hence the limitation to Mac Os X Leopard
 and newer.
 
-you must choose your destdirs for both Index and its man file, or 
-choose to perfom the copy manually.
+you must choose your destdirs for both Index and its man file, or choose
+to perfom the copy manually.
 
-How to make
------------
+How to make -----------
 
-You'll have to stand in the root directory (the directory above "src"
-and issue "make" after you have adjusted the parameters. Maybe adjusted
-the path to ncursesw.a, and ICU if you use a stand alone library. You'll
-need to have Apple's developer tools or similar in order to build it on
-OS X.
+You'll have to stand in the root directory (the directory above "src" and
+issue "make" after you have adjusted the parameters. Maybe adjusted the
+path to ncursesw.a, and ICU if you use a stand alone library. You'll need
+to have Apple's developer tools or similar in order to build it on OS X.
 
-Try make -n "all" first to assure that it finds what it needs before you
-issue make "all", then eventually make "install".
+Try make -n "all" first to assure that it finds what it needs before
+you issue make "all", then eventually make "install".
 
 **Enjoy**
 
