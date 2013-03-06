@@ -3191,7 +3191,9 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 CFLAGS="$CFLAGS -I/opt/local/include -I/usr/include"
 LDFLAGS="$LDFLAGS -L/opt/local/lib -L/usr/lib"
 
-# Checks for libraries.
+# Checks for libraries. We'll generate ALL error messages at the end, if we couldn't find our stuff.
+lib_search_failed=no
+have_icui8n=yes
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ucol_open_49 in -licui18n" >&5
 $as_echo_n "checking for ucol_open_49 in -licui18n... " >&6; }
@@ -3237,10 +3239,15 @@ _ACEOF
   LIBS="-licui18n $LIBS"
 
 else
-  as_fn_error $? "I couldnt find the ICU icui8n library. Misses correct Library path." "$LINENO" 5
+  have_icui8n=no
 fi
 
 
+if test "x${have_icui8n}" = xno; then
+	lib_search_failed=yes
+fi
+
+have_icuuc=yes
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for u_errorName_49 in -licuuc" >&5
 $as_echo_n "checking for u_errorName_49 in -licuuc... " >&6; }
 if ${ac_cv_lib_icuuc_u_errorName_49+:} false; then :
@@ -3285,10 +3292,14 @@ _ACEOF
   LIBS="-licuuc $LIBS"
 
 else
-  as_fn_error $? "I couldnt find the ICU iuuc library. Misses correct Library path." "$LINENO" 5
+  have_icuuc=no
 fi
 
+if test "x${have_icuuc}" = xno; then
+	lib_search_failed=yes
+fi
 
+have_icuio=yes
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for u_printf_49 in -licuio" >&5
 $as_echo_n "checking for u_printf_49 in -licuio... " >&6; }
 if ${ac_cv_lib_icuio_u_printf_49+:} false; then :
@@ -3333,10 +3344,13 @@ _ACEOF
   LIBS="-licuio $LIBS"
 
 else
-  as_fn_error $? "I couldnt find the ICU icuio library. Misses correct Library path." "$LINENO" 5
+  have_icuio=no
 fi
 
-
+if test "x${have_icuio}" = xno; then
+	lib_search_failed=yes
+fi
+have_icudata=yes
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for icudt49_dat in -licudata" >&5
 $as_echo_n "checking for icudt49_dat in -licudata... " >&6; }
 if ${ac_cv_lib_icudata_icudt49_dat+:} false; then :
@@ -3381,10 +3395,14 @@ _ACEOF
   LIBS="-licudata $LIBS"
 
 else
-  as_fn_error $? "I couldnt find the ICU icudata library. Misses correct Library path." "$LINENO" 5
+  have_icudata=no
 fi
 
+if test "x${have_icudata}" = xno; then
+	lib_search_failed=yes
+fi
 
+have_ncursesw=yes
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for refresh in -lncursesw" >&5
 $as_echo_n "checking for refresh in -lncursesw... " >&6; }
 if ${ac_cv_lib_ncursesw_refresh+:} false; then :
@@ -3429,11 +3447,41 @@ _ACEOF
   LIBS="-lncursesw $LIBS"
 
 else
-  as_fn_error $? "I couldnt find the  ncursesw library. Misses correct Library path." "$LINENO" 5
+  have_ncursesw=no
 fi
 
+if test "x${have_ncursesw}" = xno; then
+	lib_search_failed=yes
+fi
 
+# post processes any error messages, as we'll have to abort if we didn't find what we were looking for.
 
+if test "x${lib_search_failed}" = xyes; then
+	echo "----------------------------------------------"
+fi
+if test "x${have_icui8n}" = xno; then
+	echo "unable to find libicui8n on this system."
+fi
+
+if test "x${have_icuuc}" = xno; then
+	echo "unable to find libicuuc on this system."
+fi
+if test "x${have_icuio}" = xno; then
+	echo "unable to find libicuio on this system."
+fi
+
+if test "x${have_icudata}" = xno; then
+	echo "unable to find libicudata on this system."
+fi
+
+if test "x${have_ncursesw}" = xno; then
+	echo "unable to find libncursesw on this system."
+fi
+if test "x${lib_search_failed}" = xyes; then
+	as_fn_error $? "You must either Install the missing libraries,
+or specify correct path to your libraries with LDFLAGS, see configure --help
+----------------------------------------------" "$LINENO" 5
+fi
 # Checks for header files.
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -5678,3 +5726,22 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
+
+echo \
+"-------------------------------------------------
+
+${PACKAGE_NAME} Version ${PACKAGE_VERSION}
+
+Prefix: '${prefix}'.
+Compiler: '${CC}
+
+${CFLAGS}
+${CPPFLAGS}
+${LDFLAGS}'
+
+Now type 'make [<target>]'
+where the optional <target> is:
+all                - build all binaries
+install            - install everything
+
+--------------------------------------------------"
