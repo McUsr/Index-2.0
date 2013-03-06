@@ -33,6 +33,7 @@ install:
 
 uninstall:
 	-rm -f $(DESTDIR)$(bindir)/index
+	-rm -f $(MANPATH)/index.1
 
 
 dist: $(distdir).tar.gz
