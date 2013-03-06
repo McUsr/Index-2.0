@@ -99,6 +99,10 @@ echo \
 ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 
 Prefix: '${prefix}'.
+bindir: '${bindir}'.
+mandir: '${mandir}'.
+docdir: '${docdir}'.
+
 Compiler: '${CC}
 C-flags:
 ${CFLAGS}

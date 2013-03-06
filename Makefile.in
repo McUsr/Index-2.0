@@ -10,11 +10,11 @@ prefix	 		= @prefix@
 exec_prefix		= @exec_prefix@
 datarootdir		= @datarootdir@
 datadir			= @datadir@
+docdir			= @docdir@
 bindir			= @bindir@
 srcdir			= @srcdir@
 VPATH			= @srcdir@
 mandir			= @mandir@
-# mandir			= /man/man1
 INSTALL        	= @INSTALL@
 INSTALL_DATA   	= @INSTALL_DATA@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@
@@ -31,11 +31,22 @@ install:
 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) -m 0755 index $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) -d $(mandir)/man1
-	$(INSTALL_PROGRAM) -m 0755 $(srcdir)/man1/index.1 $(mandir)/man1
+	$(INSTALL_PROGRAM) $(srcdir)/man1/index.1 $(mandir)/man1
+	$(INSTALL_PROGRAM) -d $(docdir)/samples
+	$(INSTALL_PROGRAM) $(srcdir)/samples/* $(docdir)/samples
+	$(INSTALL_PROGRAM) $(srcdir)/README.md $(docdir)
+	$(INSTALL_PROGRAM) $(srcdir)/COPYING $(docdir)
+	$(INSTALL_PROGRAM) $(srcdir)/CHANGELOG $(docdir)
+	$(INSTALL_PROGRAM) $(srcdir)/NEWS $(docdir)
+	$(INSTALL_PROGRAM) -d $(docdir)/LICENSES
+	$(INSTALL_PROGRAM) $(srcdir)/LICENSES/* $(docdir)/LICENSES
 
 uninstall:
 	-rm -f $(DESTDIR)$(bindir)/index
 	-rm -f $(mandir)/man1/index.1
+	-rm -f $(docdir)/samples/*
+	-rm -f $(docdir)/LICENSES/*
+	-rm -f $(docdir)/*
 
 
 dist: $(distdir).tar.gz
@@ -56,6 +67,15 @@ $(distdir):
 		cp $(HEADERFILES) $(distdir)/src
 		mkdir -p $(distdir)/man1
 		cp $(srcdir)/man1/index.1 $(distdir)/man1/index.1
+		mkdir -p $(distdir)/samples
+		cp $(srcdir)/samples/* $(distdir)/samples
+		cp $(srcdir)/README.md $(distdir)
+		cp $(srcdir)/COPYING $(distdir)
+		cp $(srcdir)/CHANGELOG $(distdir)
+		cp $(srcdir)/NEWS $(distdir)
+		mkdir -p $(distdir)/LICENSES
+		cp $(srcdir)/LICENSES/* $(distdir)/LICENSES
+		
 
 FORCE:
 	-rm $(distdir).tar.gz &>/dev/null
@@ -68,6 +88,7 @@ distcheck: $(distdir).tar.gz
 		$(MAKE) -C $(distdir) \
 		DESTDIR=$${PWD}/$(distdir)/_inst \
 		mandir=$${PWD}/$(distdir)/_inst/share/man/man1 \
+		docdir=$${PWD}/$(distdir)/_inst/share/doc/index \
 		install uninstall
 		$(MAKE) -C $(distdir) clean
 		rm -rf $(distdir)
@@ -82,6 +103,7 @@ config.status: $(srcdir)/configure
 
 
 chkstuff:
+	@echo docdir: $(docdir)
 	@echo mandir: $(mandir)
 	@echo datarootdir: $(datarootdir)
 	@echo datadir: $(datadir)
