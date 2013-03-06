@@ -67,7 +67,9 @@ if test "x${have_ncursesw}" = xno; then
 	echo "unable to find libncursesw on this system."
 fi
 if test "x${lib_search_failed}" = xyes; then
-	AC_MSG_ERROR([You must either Install the missing libraries, or specify correct path to your libraries with LDFLAGS, see configure --help])
+	AC_MSG_ERROR([You must either Install the missing libraries,
+or specify correct path to your libraries with LDFLAGS, see configure --help
+----------------------------------------------])
 fi
 # Checks for header files.
 AC_CHECK_HEADERS([locale.h stddef.h stdlib.h string.h sys/file.h sys/param.h unistd.h wchar.h wctype.h])
@@ -90,3 +92,24 @@ AC_CONFIG_FILES([Makefile
 src/Makefile])
 
 AC_OUTPUT
+
+echo \
+"-------------------------------------------------
+
+${PACKAGE_NAME} Version ${PACKAGE_VERSION}
+
+Prefix: '${prefix}'.
+Compiler: '${CC}
+C-flags:
+${CFLAGS}
+Cpp-flags:
+${CPPFLAGS}
+Ld-flags:
+${LDFLAGS}'
+
+Now type 'make @<:@<target>@:>@'
+where the optional <target> is:
+all                - build all binaries
+install            - install everything
+
+--------------------------------------------------"
