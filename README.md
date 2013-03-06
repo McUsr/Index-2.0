@@ -142,7 +142,9 @@ configure find the **ICU-libs** and the **ncursesw** libraries.
 * LIBS 			: This variable is for specifying libraries directly
 you will have no usage of this variable during this configure.
 
-* Setting the variables:
+Setting the variables:
+----------------------
+
 You specify the variable before you execute the **./configure** script.
 Like this:
 CFLAGS="-g -O3"
@@ -156,14 +158,41 @@ here prioritized by what I think is the most important ones to the lesser.
 Options for compiling and making index
 --------------------------------------
 
-* **--libdir**
+In the examples I use the path ../ in front of configure, imagining I am standing
+in a "build" folder.
 
-* **--includedir**
+* **--libdir** 	:This option tells configure where to look for your libraries
+Example:
+../configure --libdir=/opt/lib --libdir=/usr/lib
+Tells configure to first check /opt/lib, then /usr/lib for libraries.
+
+* **--includedir**	:This option tells configure where to look for your include files.
+Example:
+../configure --includedir=/opt/include --includedir=/usr/include
+Tells configure to first check /opt/include then /usr/include for header files.
 
 Options that influences the installation.
 ----------------------------------------
 
-* **--prefix**
+* **--prefix** : This prefix option, is kind of a general option, to specify
+the "root" of the installation. there should be a bin, and a  share directory
+under this path, or they will be created, under the share directory, there should be
+a man/man1..N tree, or at least man/man1 will be created to have a place for index.1
+It will also be created a share/index directory for storing documents relating to 
+index, and samples.
+
+Example:
+**../configure --prefix=/opt**
+
+Tells configure to install index and man1/index.1 into /opt/bin/index
+
+or **a=~/opt ../configure --prefix=$a**
+
+Tells configure to install index and auxuillary files under ~/opt I
+recommend to place the stuff here or in ~/usr, this is called "account
+install" This makes it easy to take the software with you with an
+operating system upgrade since it resides in your homefolder, it will
+also never conflict with any packet-manager.
 
 * **--bindir**
 
