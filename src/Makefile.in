@@ -22,10 +22,6 @@ DEFS			= @DEFS@
 CC             	= @CC@
 CFLAGS         	= @CFLAGS@
 CPPFLAGS       	= @CPPFLAGS@
-INSTALL        	= @INSTALL@
-INSTALL_DATA   	= @INSTALL_DATA@
-INSTALL_PROGRAM	= @INSTALL_PROGRAM@
-INSTALL_SCRIPT 	= @INSTALL_SCRIPT@
 
 
 SRCFILES := $(shell find $(srcdir) -type f -name "*.c")
@@ -37,15 +33,7 @@ all: index
 
 
 index: $(OBJFILES)
-	$(CC) $(CFLAGS) $(DEFS)  $(CPPFLAGS) -g -I. -I$(srcdir) -I.. -o $@ $+ $(LDFLAGS) $(LIBS)
-	
-install:
-	$(INSTALL) -d $(DESTDIR)$(bindir)/index
-	$(INSTALL_PROGRAM) -m 0755 index $(DESTDIR)$(bindir)/index
-
-uninstall:
-	-rm -f $(DESTDIR)/bin
-
+	$(CC) $(CFLAGS) $(DEFS)  $(CPPFLAGS) -g -I. -I$(srcdir) -I.. -o ../$@ $+ $(LDFLAGS) $(LIBS)
 clean:
 	-rm index
 

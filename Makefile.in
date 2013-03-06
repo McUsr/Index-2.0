@@ -1,17 +1,22 @@
 # @configure_input@
 
 # Package-related substitution variables
-package        = @PACKAGE_NAME@
-version        = @PACKAGE_VERSION@
-tarname	= @PACKAGE_TARNAME@
-distdir	= $(tarname)-$(version)
+package 		= @PACKAGE_NAME@
+version    		= @PACKAGE_VERSION@
+tarname			= @PACKAGE_TARNAME@
+distdir			= $(tarname)-$(version)
 
 # Prefix-related substitution variables
-prefix	 = @prefix@
-exec_prefix    = @exec_prefix@
-bindir	 = @bindir@
-srcdir			 = @srcdir@
-VPATH			 = @srcdir@
+prefix	 		= @prefix@
+exec_prefix		= @exec_prefix@
+bindir			= @bindir@
+srcdir			= @srcdir@
+VPATH			= @srcdir@
+
+INSTALL        	= @INSTALL@
+INSTALL_DATA   	= @INSTALL_DATA@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+INSTALL_SCRIPT 	= @INSTALL_SCRIPT@
 
 
 SRCFILES := $(shell find $(srcdir)/src -type f -name "*.c")
@@ -19,6 +24,14 @@ HEADERFILES := $(shell find $(srcdir)/src -type f -name "*.h")
 
 all clean index objcheck:
 	$(MAKE) -C src $@
+	
+install:
+	$(INSTALL_PROGRAM) -d $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) -m 0755 index $(DESTDIR)$(bindir)
+
+uninstall:
+	-rm -f $(DESTDIR)$(bindir)/index
+
 
 dist: $(distdir).tar.gz
 
@@ -61,8 +74,10 @@ config.status: $(srcdir)/configure
 
 
 chkstuff:
+	@echo $(INSTALL_PROGRAM)
 	@echo @DEFS@
 	@echo $(srcdir)
 	@echo $(SRCFILES)
 	@echo $(HEADERFILES)
-.PHONY: FORCE all clean dist
+.PHONY: FORCE all clean dist distcheck
+.PHONY: install
