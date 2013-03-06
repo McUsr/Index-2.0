@@ -93,8 +93,12 @@ Other platforms
 I have no hopes about this being easy to install under cygwin or anything
 but since GNU autotools are used, I suppose it wont't be impossible.
 
-If this is your case, and you face problems, don't hesitate to take
-contact.
+If this is your case, and you face problems, don't hesitate to contact me
+(through "issues").
+
+Thanks to GNU autotools I have high hopes that this package will just
+install on other *nixes. If it don't, don't hesitate. ("issues"), and I'll
+see what I can do, swiftly!
 
 General prequisites
 -------------------
@@ -104,8 +108,19 @@ Having this in shape, and the paths to where it is installed, then
 it is time to perform the installation.
 
 
-1. The Configuration
+The Configuration
 ====================
+
+The short version
+-----------------
+
+1. configure
+2. make all
+3. sudo make install
+
+
+The more elaborate (boring) version.
+------------------------------------
 
 Stand in the root of the project. (Same directory as you found this
 document.) It is your call whether you want to create a folder to
@@ -116,6 +131,12 @@ Preliminaries
 I'll take this a little bit slow in case this is the first time you
 are using a configure script. Go to **Configuring the project** if
 I am boring you.
+
+First of all: you can configure an "autoconfiscated" projects by two
+means, environment variables that steers the compilation, and prefixes
+to the configure script that controls the details of the compilation and
+installation,in this case, configure can do so much more, but that is
+all that is needed for this project.
 
 The C-compiler environment uses a series of environment variables
 for setting flags, and finding stuff, you can set those variables
@@ -147,11 +168,21 @@ Setting the variables:
 
 You specify the variable before you execute the **./configure** script.
 Like this:
-CFLAGS="-g -O3"
+CFLAGS="-g -O3" (CFLAGS="-arch= X86_64" is another example.) 
 
-Configuring the project
------------------------
-You should really try ./configure --help to see all the options,
+
+**Configuring the project** 
+--------------------------
+
+Short version:
+--------------
+
+**--help**, **--libdir**, **--includedir**, **--prefix**, **--bindir**, **--mandir** and **--docdir** works.
+
+Long version:
+-------------
+
+You should really try **./configure --help** to see all the options,
 I'll go through the most important settings or those that will work
 here prioritized by what I think is the most important ones to the lesser.
 
@@ -184,9 +215,13 @@ index, and samples.
 Example:
 **../configure --prefix=/opt**
 
-Tells configure to install index and man1/index.1 into /opt/bin/index
+Tells configure to install index, man1/index.1, samples and
+other docs into /opt/bin/index, /opt/share/man/man1/index.1
+/opt/share/doc/index/samples and /opt/share/doc (the docs, including
+this).
 
 or **a=~/opt ../configure --prefix=$a**
+Works the same way but uses another root: (~/opt).
 
 Tells configure to install index and auxuillary files under ~/opt I
 recommend to place the stuff here or in ~/usr, this is called "account
@@ -195,34 +230,53 @@ operating system upgrade since it resides in your homefolder, it will
 also never conflict with any packet-manager.
 
 * **--bindir**
+This is a more selective option it works like the  **--prefix** option,
+but works only for specifying the path to put the binary index.
+Handy to use if you want to specify stuff in different "trees".
+
+Example:
+**../configure --bindir=/opt/bin**
 
 * **--mandir**
+This is a more selective option it works like the  **--prefix** option,
+but works only for specifying the path to put the index man file..
+Example:
 
 * **--docdir**
+This is a more selective option it works like the  **--prefix** option,
+but works only for specifying the path to put the docs and samples files.
+Handy to use if you want to specify stuff in different "trees". You can of course
+specify a place you'll later trash. :)
+Example:
+**../configure --docdir=/opt/share/doc/index**
+
+Ok, that's all about the configure options, --help included, you don't
+have much use for any of the others when configuring this package.
 
 
-Make configuration ------------------
+Make configuration
+------------------
 
-I urge you to read the makefile carefully, it builds as both an X86_64
-and i386 executable.
+Make rules not war!
 
-You can use a stand alone ICU library, but I have chosen to use the
-ICU that ships with Mac Os X, hence the limitation to Mac Os X Leopard
-and newer.
+* all:				Compiles the program.
 
-you must choose your destdirs for both Index and its man file, or choose
-to perfom the copy manually.
+* install:			Installs the package.
 
-How to make -----------
+* uninstall:		Uninstalls the package, save directories created during installation.
 
-You'll have to stand in the root directory (the directory above "src" and
-issue "make" after you have adjusted the parameters. Maybe adjusted the
-path to ncursesw.a, and ICU if you use a stand alone library. You'll need
-to have Apple's developer tools or similar in order to build it on OS X.
+* install-strip:	Like install but strips the executable for debug information.
 
-Try make -n "all" first to assure that it finds what it needs before
-you issue make "all", then eventually make "install".
+* clean:			Deletes all files in the current directory that where created during the build.
+
+* distclean:		Deletes all files in the current directory that where made by building or configuring this program.
+
+dist:				Create a distribution tar file of this package.
+
+distcheck:			Checks if the dist rule behaves sanely.
+
+If you want more information about those make rules, feel free to read the GNU Coding Standard chp. 7.
 
 **Enjoy**
 
-Tommy
+Tommy/McUsr

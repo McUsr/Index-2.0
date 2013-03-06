@@ -5733,10 +5733,16 @@ echo \
 ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 
 Prefix: '${prefix}'.
-Compiler: '${CC}
+bindir: '${bindir}'.
+mandir: '${mandir}'.
+docdir: '${docdir}'.
 
+Compiler: '${CC}
+C-flags:
 ${CFLAGS}
+Cpp-flags:
 ${CPPFLAGS}
+Ld-flags:
 ${LDFLAGS}'
 
 Now type 'make [<target>]'
