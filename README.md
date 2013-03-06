@@ -129,23 +129,48 @@ additon to those set in the makefile. (**-g** is always set, if you really
 want to strip out the debug information, then **"make install-strip"**
 afterwards.)
 
-CPPFLAGS		: This variable contains flags and defines for the 
+* CPPFLAGS		: This variable contains flags and defines for the 
 C-preprocessor. The most important ones coming to my mind is ther
 **-Iincludepath**
 
-LDFLAGS			: This variable contains flags for the linking
+* LDFLAGS			: This variable contains flags for the linking
 stager of the compilation, or linker if a separate linker is used. The
 most common usage is to specify the path to the libraries, you may have
 to specify the paths to something like -L/opt/lib, or similar to make
 configure find the **ICU-libs** and the **ncursesw** libraries.
 
-LIBS 			: This variable is for specifying libraries directly
+* LIBS 			: This variable is for specifying libraries directly
 you will have no usage of this variable during this configure.
+
+* Setting the variables:
+You specify the variable before you execute the **./configure** script.
+Like this:
+CFLAGS="-g -O3"
 
 Configuring the project
 -----------------------
-1.	You should really try ./configure --help to see the options,
-I'll go through the most important settings or those that works here.
+You should really try ./configure --help to see all the options,
+I'll go through the most important settings or those that will work
+here prioritized by what I think is the most important ones to the lesser.
+
+Options for compiling and making index
+--------------------------------------
+
+* **--libdir**
+
+* **--includedir**
+
+Options that influences the installation.
+----------------------------------------
+
+* **--prefix**
+
+* **--bindir**
+
+* **--mandir**
+
+* **--docdir**
+
 
 Make configuration ------------------
 
