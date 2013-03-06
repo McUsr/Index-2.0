@@ -1,5 +1,4 @@
-# @configure_input@
-
+# @configure_input@ 
 # Package-related substitution variables
 package 		= @PACKAGE_NAME@
 version    		= @PACKAGE_VERSION@
@@ -12,7 +11,8 @@ exec_prefix		= @exec_prefix@
 bindir			= @bindir@
 srcdir			= @srcdir@
 VPATH			= @srcdir@
-
+mandir			= /man/man1
+MANPATH			= @datarootdir@$(mandir)
 INSTALL        	= @INSTALL@
 INSTALL_DATA   	= @INSTALL_DATA@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@
@@ -28,6 +28,8 @@ all clean index objcheck:
 install:
 	$(INSTALL_PROGRAM) -d $(DESTDIR)$(bindir)
 	$(INSTALL_PROGRAM) -m 0755 index $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) -d $(MANPATH)
+	$(INSTALL_PROGRAM) -m 0755 $(srcdir)/man1/index.1 $(MANPATH)
 
 uninstall:
 	-rm -f $(DESTDIR)$(bindir)/index
@@ -74,6 +76,7 @@ config.status: $(srcdir)/configure
 
 
 chkstuff:
+	@echo $(MANPATH)
 	@echo $(INSTALL_PROGRAM)
 	@echo @DEFS@
 	@echo $(srcdir)
