@@ -271,11 +271,13 @@ Make rules not war!
 
 * distclean:		Deletes all files in the current directory that where made by building or configuring this program.
 
-dist:				Create a distribution tar file of this package.
+* dist:				Create a distribution tar file of this package.
 
-distcheck:			Checks if the dist rule behaves sanely.
+* distcheck:			Checks if the dist rule behaves sanely.
 
 If you want more information about those make rules, feel free to read the GNU Coding Standard chp. 7.
+
+If there is anything here that is fuzzy, boring or unclear, file an issue. ;)
 
 **Enjoy**
 
