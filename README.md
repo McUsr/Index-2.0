@@ -111,8 +111,11 @@ Stand in the root of the project. (Same directory as you found this
 document.) It is your call whether you want to create a folder to
 build in or build directly in the source folder.
 
+Preliminaries
+-------------
 I'll take this a little bit slow in case this is the first time you
-are using a configure script.
+are using a configure script. Go to ** Configuring the project** if
+I am boring you.
 
 The C-compiler environment uses a series of environment variables
 for setting flags, and finding stuff, you can set those variables
@@ -121,17 +124,23 @@ with your particular options.
 The variables are:
 
 * CFLAGS 		: This variable should contain the compiler options
-like -g, -O2 and so on. Those are the settings you want to set in
-additon to those set in the makefile. (-g is always set, if you really
-want to strip out the debug information, then "make install-strip"
+like **-g, -O2** and so on. Those are the settings you want to set in
+additon to those set in the makefile. (**-g** is always set, if you really
+want to strip out the debug information, then **"make install-strip"**
 afterwards.)
 
-CPPFLAGS
+CPPFLAGS		: This variable contains flags and defines for the 
+C-preprocessor. The most important ones coming to my mind is ther
+**-Iincludepath**
 
-LDFLAGS
+LDFLAGS			: This variable contains flags for the linking stager
+of the compilation, or linker if a separate linker is used. The most common
+usage is to specify the path to the libraries, you may have to specify the paths
+to something like -L/opt/lib, or similar to make configure find the **ICU-libs**
+and the **ncursesw** libraries.
 
-LIBS
-
+LIBS 			: This variable is for specifying libraries directly
+you will have no usage of this variable during this configure.
 
 Make configuration ------------------
 
