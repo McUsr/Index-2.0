@@ -12,7 +12,7 @@ bindir			= @bindir@
 srcdir			= @srcdir@
 VPATH			= @srcdir@
 mandir			= /man/man1
-MANPATH			= @datarootdir@$(mandir)
+MANPATH			= $(prefix)/share$(mandir)
 INSTALL        	= @INSTALL@
 INSTALL_DATA   	= @INSTALL_DATA@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@
@@ -52,6 +52,8 @@ $(distdir):
 		cp $(srcdir)/src/Makefile.in $(distdir)/src
 		cp $(SRCFILES) $(distdir)/src
 		cp $(HEADERFILES) $(distdir)/src
+		mkdir -p $(distdir)/man1
+		cp $(srcdir)/man1/index.1 $(distdir)/man1/index.1
 
 FORCE:
 	-rm $(distdir).tar.gz &>/dev/null
@@ -63,6 +65,7 @@ distcheck: $(distdir).tar.gz
 		$(MAKE) -C $(distdir) all # check
 		$(MAKE) -C $(distdir) \
 		DESTDIR=$${PWD}/$(distdir)/_inst \
+		MANPATH=$${PWD}/$(distdir)/_inst/share/$(mandir) \
 		install uninstall
 		$(MAKE) -C $(distdir) clean
 		rm -rf $(distdir)
