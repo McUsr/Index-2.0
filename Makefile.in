@@ -44,6 +44,7 @@ install:
 	$(INSTALL_PROGRAM) $(srcdir)/NEWS $(docdir)
 	$(INSTALL_PROGRAM) -d $(docdir)/LICENSES
 	$(INSTALL_PROGRAM) $(srcdir)/LICENSES/* $(docdir)/LICENSES
+	-$(INSTALL_PROGRAM) -d $(HOME)/.index
 
 uninstall:
 	-rm -f $(DESTDIR)$(bindir)/index
