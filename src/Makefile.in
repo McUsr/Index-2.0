@@ -15,6 +15,7 @@ prefix         	= @prefix@
 exec_prefix    	= @exec_prefix@
 bindir         	= @bindir@ 
 srcdir			= @srcdir@
+docdir 			= @docdir@
 VPATH			= @srcdir@
 DEFS			= @DEFS@
 
@@ -29,14 +30,17 @@ SRCFILES := $(shell find $(srcdir) -type f -name "*.c")
 TOBJFILES  = $(subst $(srcdir)/,,$(SRCFILES)) 
 OBJFILES  := $(patsubst %.c,%.o,$(TOBJFILES)) 
 
-all: index
+all: PRE index
 
 
 index: $(OBJFILES)
-	$(CC) $(CFLAGS) $(DEFS)  $(CPPFLAGS) -g -I. -I$(srcdir) -I.. -o ../$@ $+ $(LDFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) $(DEFS)  $(CPPFLAGS) -g -I. -I$(srcdir) -I.. -o $@ $+ $(LDFLAGS) $(LIBS)
+	cp $@ ..
 
 clean:
 	-rm ../index
+	-rm ../samples_dir.h
+	-rm index
 	-rm $(OBJFILES)
 
 Makefile: Makefile.in ../config.status
@@ -45,13 +49,8 @@ Makefile: Makefile.in ../config.status
 ../config.status: $(srcdir)/../configure
 	cd .. && ./config.status --recheck
 
-libcheck:
-	echo $(LIBS)
 	
-hdrcheck:
-	echo $(CFLAGS)
-	
-objcheck:
-	echo $(OBJFILES)
-	
-.PHONY: all clean check install uninstall
+PRE:
+	echo "#define SAMPLES_DIR \""$(docdir)"/samples\"" >../samples_dir.h
+
+.PHONY: all clean PRE

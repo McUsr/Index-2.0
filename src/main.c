@@ -22,6 +22,7 @@
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif
+#include <samples_dir.h>
 #include "common.h"
 #include "initcurses.h"
 #include "defs.h"
@@ -35,11 +36,6 @@
 #include "dbprint.h"
 #include "dbfilename.h"
 
-
-/* versjon numbering */
-static int index_ver_major = 2;
-
-static int index_ver_minor = 0;
 
 static void main_menu(void);
 
@@ -343,21 +339,21 @@ findUtf8OrDie(void)
 static void
 print_version(void)
 {
-    fprintf(stdout,"index version:  %d.%d\n",index_ver_major,index_ver_minor) ;
+    fprintf(stdout,"index version:  %s\n",PACKAGE_VERSION) ;
     fprintf(stdout,"Copyright by David A. Curry  and Tommy Bollman © 1989-2013\n") ;
     fprintf(stdout,"Index uses the ICU Library copyright Icu-project.org see index --copyright.\n") ;
-    fprintf(stdout,"Index uses also the  Ncurses library version 5.9, copyright Eric S. Ramymond et.al\n") ;
+    fprintf(stderr,"Sample files were installed at: %s\n",SAMPLES_DIR) ;
     exit(0) ;
 }
 
 static void
 print_copyright(void)
 {
-    fprintf(stdout,"index version:  %d.%d\n",index_ver_major,index_ver_minor) ;
+    fprintf(stdout,"index version:  %s\n",PACKAGE_VERSION) ;
     fprintf(stdout,"Copyright by David A. Curry  and Tommy Bollman © 1989-2013 and put into Public Domain\n") ;
     fprintf(stdout,"This does not pertain the libraries used, where the copyright and usage terms are set by their proprietors.\n") ;
     fprintf(stdout,"Index uses the ICU Library copyright Icu-project.org see index --copyright.\n\n") ;
-    fprintf(stdout,"Index uses also the  Ncurses library version 5.9, copyright Eric S. Ramymond et.al\n\n") ;
+    fprintf(stdout,"Index uses also the  Ncurses library version 5.9, copyright GNU\n\n") ;
 	fprintf(stderr,"ICU library version 49.1.2\n\nCopyright (c) 1995-2012 International Business Machines Corporation and others\n \n          \n          All rights reserved.\n \n\ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, provided that the above copyright notice(s) and this permission notice appear in all copies of the Software and that both the above copyright notice(s) and this permission notice appear in supporting documentation.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.\n\n        Except as contained in this notice, the name of a copyright holder shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Software without prior written authorization of the copyright holder.\n");
     exit(0) ;
 }
@@ -421,7 +417,9 @@ static void help(void)
     fprintf(stderr,"\t-C, --copyright\n\n") ;
     fprintf(stderr,"index is a program that lets you make and maintain small structured collections of information.\n") ;
     fprintf(stderr,"index uses UTF-8 text encoding, and your Country's collation order for sorting.\n") ;
+    fprintf(stderr,"Sample files were installed at: %s\n",SAMPLES_DIR) ;
     fprintf(stderr," See \"man index\" for further help.\n");
+    fprintf(stderr,"Please report any bugs to %s\n",PACKAGE_BUGREPORT) ;
     
 	exit(0);
 }
