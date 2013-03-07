@@ -52,6 +52,14 @@ uninstall:
 	-rm -f $(docdir)/LICENSES/*
 	-rm -f $(docdir)/*
 
+distclean:
+	-$(MAKE) -C src clean 
+	-rm src/Makefile
+	-rmdir src
+	-rm Makefile
+	-rm config.h
+	-rm	config.log
+	-rm	config.status
 
 dist: $(distdir).tar.gz
 
@@ -119,4 +127,4 @@ chkstuff:
 	@echo $(SRCFILES)
 	@echo $(HEADERFILES)
 .PHONY: FORCE all clean dist distcheck
-.PHONY: install
+.PHONY: install distclean uninstall install-strip

@@ -96,7 +96,7 @@ src/Makefile])
 AC_OUTPUT
 
 echo \
-"-------------------------------------------------
+"------------------------------------------------------------
 
 ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 
@@ -115,7 +115,23 @@ ${LDFLAGS}'
 
 Now type 'make @<:@<target>@:>@'
 where the optional <target> is:
-all                - build all binaries
-install            - install everything
 
---------------------------------------------------"
+all             - build all binaries
+
+install         - install everything
+
+uninstall       - uninstall everything.
+
+install-strip   - strips debug info out of binary.
+
+clean           - deletes all files that where made
+                  during the build in current directory.
+
+distclean       - deletes all files that were made during
+                  build or config in the current directory.
+				  
+dist            - create a distribution tar of this package.
+
+distcheck       - tests the quality of the distribution tar.
+
+-------------------------------------------------------------"
