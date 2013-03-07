@@ -146,6 +146,7 @@ void select_db(void)
         char *labelfn =  getFullLabelFileName() ; 
         if ( file_is_empty(labelfn) || (!labelFileOkAfterLinting(labelfn))) {
             ysimpleError("Index: User defaulted creating a new database. We exit.!",YX_ALL_WELL) ;
+            exit(0);
         } 
         setLabelFileCreated() ;    
     }
