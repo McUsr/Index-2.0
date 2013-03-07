@@ -354,7 +354,23 @@ print_copyright(void)
     fprintf(stdout,"This does not pertain the libraries used, where the copyright and usage terms are set by their proprietors.\n") ;
     fprintf(stdout,"Index uses the ICU Library copyright Icu-project.org see index --copyright.\n\n") ;
     fprintf(stdout,"Index uses also the  Ncurses library version 5.9, copyright GNU\n\n") ;
-	fprintf(stderr,"ICU library version 49.1.2\n\nCopyright (c) 1995-2012 International Business Machines Corporation and others\n \n          \n          All rights reserved.\n \n\ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, provided that the above copyright notice(s) and this permission notice appear in all copies of the Software and that both the above copyright notice(s) and this permission notice appear in supporting documentation.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.\n\n        Except as contained in this notice, the name of a copyright holder shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Software without prior written authorization of the copyright holder.\n");
+	fprintf(stderr,"ICU library version 49.1.2\n\nCopyright (c) 1995-2012 International Business Machines Corporation and others\n") ;
+    fprintf(stderr,"        All rights reserved.\n") ;
+    fprintf(stderr,"Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated\n");
+    fprintf(stderr,"documentation files the \"Software\"), to deal in the Software without restriction, including without limitation\n") ;
+    fprintf(stderr,"the rights to use, copy, modify, merge, publish, distribute, and/or sell copies of the Software, and to permit\n") ;
+    fprintf(stderr,"persons to whom the Software is furnished to do so, provided that the above copyright notice(s) and this\n") ;
+    fprintf(stderr," permission notice appear in all copies of the Software and that both the above copyright notice(s)\n");
+    fprintf(stderr,"and this permission notice appear in supporting documentation.\n\n");
+    fprintf(stderr,"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED\n");
+    fprintf(stderr,"TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.\n");
+    fprintf(stderr,"IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL\n") ;
+    fprintf(stderr,"INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER\n") ;
+    fprintf(stderr,"IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR\n");
+    fprintf(stderr,"PERFORMANCE OF THIS SOFTWARE.\n\n");
+    fprintf(stderr,"       Except as contained in this notice, the name of a copyright holder shall not be used in advertising or\n") ;
+    fprintf(stderr,"otherwise to promote the sale, use or other dealings in this Software without prior written authorization of\n");
+    fprintf(stderr,"the copyright holder.\n");
     exit(0) ;
 }
 
